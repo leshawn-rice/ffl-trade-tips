@@ -1,0 +1,49 @@
+{% extends 'form_base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+
+{% block card_title %}Create an Account{% endblock %}
+
+{% block form %}
+
+<form method="POST">
+
+    {{form.hidden_tag()}}
+
+    {% for field in form 
+                if field.widget.input_type != 'hidden' %}
+
+    <div class="form-group row justify-content-center">
+        <div class="col-8">
+            {{field.label}}
+            {{field(class_="form-control")}}
+
+            {% if field.label.text == 'Username' and session['username_taken'] == True%}
+            <small id="username-taken" class="badge badge-warning w-100">Username Taken</small>
+            {% endif %}
+
+            {% if field.label.text == 'Email' and session['email_taken'] == True%}
+            <small id="email-taken" class="badge badge-warning w-100">Email Taken</small>
+            {% endif %}
+
+            {% for error in field.errors %}
+            <div class="badge badge-danger">{{error}}</div>
+            {% endfor %}
+
+            {% if field.label.text == 'Confirm Password' %}
+            <small id="password-help" class="form-text text-muted mx-2">8+ characters. One or more
+                Uppercase & lowercase letters. One or more numbers.</small>
+            {% endif %}
+
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="form-group row justify-content-center">
+        <button type="submit" class="btn btn-outline-light mt-1">Sign Up</button>
+    </div>
+
+</form>
+
+{% endblock %}

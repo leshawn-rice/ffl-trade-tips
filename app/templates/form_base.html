@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block log_sign_active %}active{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center my-3">
+    <div class="col-12">
+        {% block form %}
+        {% endblock %}
+    </div>
+    {% block form_footer %}
+    {% endblock %}
+</div>
+
+{% endblock %}

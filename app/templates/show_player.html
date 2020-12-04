@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}{{player.full_name}}{% endblock %}
+
+{% block content %}
+
+
+<div class="row my-2 justify-content-center">
+    <div class="col-12 col-md-4">
+        <div class="card bg-dark text-light">
+            <div class="card-header text-center">{{player.full_name}}</div>
+            <div class="card-body text-center">
+                <img class="img-fluid"
+                    src="https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/{{player.player_id}}.png&w=200&h=200&cb=1"
+                    alt="{{player.full_name}} Picture">
+            </div>
+            <div class="card-footer text-center">
+                <a href="/players/{{player.id}}/stats" class="btn btn-success">Stats!</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

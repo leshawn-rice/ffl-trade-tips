@@ -1,0 +1,54 @@
+body {
+  background-color: rgb(212, 211, 211);
+}
+
+
+.nav-link {
+  padding: 0rem;
+}
+
+.nav-item.active {
+  background-color: #e25664;
+  border-radius: 0.8rem;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: space-around;
+}
+
+#profile-phone {
+  display: none;
+}
+#profile-desktop {
+  display: inline;
+}
+
+#settings-phone {
+  display: none;
+}
+#settings-desktop {
+  display: inline;
+}
+
+@media only screen and (max-width: 600px) {
+  #profile-phone {
+    display: inline;
+  }
+  #profile-desktop {
+    display: none;
+  }
+
+  #settings-phone {
+    display: inline;
+  }
+  #settings-desktop {
+    display: none;
+  }
+}

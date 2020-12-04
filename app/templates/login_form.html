@@ -1,0 +1,57 @@
+{% extends 'form_base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block card_title %}Login{% endblock %}
+
+{% block form %}
+
+<form method="POST">
+
+    {{form.hidden_tag()}}
+
+    {% for field in form 
+                if field.widget.input_type != 'hidden' %}
+
+    <div class="form-group row justify-content-center">
+        <div class="col-8">
+            {{field.label}}
+            {{field(class_="form-control")}}
+
+            {% for error in field.errors %}
+            <div class="badge badge-danger">{{error}}</div>
+            {% endfor %}
+
+            {% if field.label.text == 'Password' %}
+            <small id="password-help" class="form-text text-muted mx-2">8+ characters. One or more
+                Uppercase & lowercase letters. One or more numbers.</small>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            {% for message in messages %}
+            <div class="badge badge-danger">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+            {% endif %}
+        </div>
+    </div>
+
+    {% endfor %}
+
+    <div class="form-group row justify-content-center">
+        <button type="submit" class="btn btn-outline-light mt-2">Login</button>
+    </div>
+
+</form>
+
+{% endblock %}
+
+{% block form_footer %}
+<div class="row">
+    <div class="col-12">
+        <p class="lead">Don't have an account? <span><a href="sign-up"
+                    class="btn btn-sm btn-light text-dark ml-3"><b>Sign
+                        Up</b></a></span></p>
+    </div>
+</div>
+{% endblock %}
