@@ -23,6 +23,11 @@ body {
   justify-content: space-around;
 }
 
+.table a {
+  color: white;
+  box-shadow: lightblue;
+}
+
 #profile-phone {
   display: none;
 }

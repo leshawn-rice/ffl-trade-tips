@@ -2,7 +2,7 @@
 
 {% block navbar %}
 <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-danger justify-content-start p-0">
-    <p class="navbar-brand d-flex align-self-center font-weight-bold m-0 p-0">Fantasy Football Trades</p>
+    <p class="navbar-brand d-flex align-self-center font-weight-bold m-0 p-0">Fantasy Football Trade Tips</p>
     {% if session['logged_in'] %}
     <a class="nav-link ml-auto text-dark" id="profile-phone" href="/profile"><i class="fas fa-user"></i></a>
     <a class="nav-link ml-auto text-dark" id="settings-phone" href="/settings"><i class="fas fa-cog"></i></a>
@@ -12,7 +12,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbar-toggler">
-        <ul class="navbar-nav mr-auto mt-lg-0" id="navbar-left-items">
+        <ul class="navbar-nav ml-4 mt-lg-0" id="navbar-left-items">
             <li class="nav-item {% block home_active %}{% endblock %} text-center">
                 <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
             </li>
@@ -47,7 +47,7 @@
 <footer class="footer bg-danger">
     <div class="row">
         <div class="col-4">
-            <p class="h6">Leshawn Rice 2020</p>
+            <p class="h6 ml-3">Leshawn Rice 2020</p>
         </div>
         <div class="col-8 footer-links">
             <a href="https://github.com/leshawn-rice" target="_blank" class="text-dark" data-toggle="tooltip"

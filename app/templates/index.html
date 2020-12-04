@@ -15,26 +15,11 @@
     <p>I need to redo the design for the site.</p>
     <hr class="my-4">
     <p>Other than that this capstone is mostly done!</p>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam, odio veritatis quibusdam voluptatum voluptatibus
-        aliquid! Quisquam assumenda quis neque fugiat, vel suscipit incidunt est, nihil modi, natus vero! Velit, ad!</p>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Odit vel doloremque, quos minima maxime magni ad natus
-    saepe voluptatum dolores reprehenderit animi in hic modi deserunt repellat nemo, magnam molestiae. Lorem ipsum,
-    dolor sit amet consectetur adipisicing elit. Odit fuga reiciendis cum atque ipsum repellat, dolorum, nisi
-    asperiores, minus distinctio rerum fugiat aliquam aut perferendis id perspiciatis omnis nostrum natus. Lorem ipsum
-    dolor sit amet, consectetur adipisicing elit. Eaque modi culpa, doloremque deserunt sunt assumenda saepe nisi
-    architecto vitae dolores quam adipisci consequatur tenetur libero cupiditate animi praesentium inventore fugiat.
-    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Possimus, rerum quisquam corporis non nihil minima quod
-    ipsa consequatur consequuntur est, officia ad quo, fugit culpa eos quam dolorem exercitationem laborum. Lorem ipsum
-    dolor sit amet consectetur adipisicing elit. Molestias illo error, sed fugit iure dignissimos praesentium obcaecati
-    laudantium repellat omnis quidem exercitationem voluptatum, dicta suscipit in itaque. Alias, harum enim! Lorem ipsum
-    dolor sit amet consectetur adipisicing elit. Asperiores aliquam voluptatem eum sint fuga similique mollitia
-    expedita, nostrum sapiente consequuntur veniam atque cumque delectus dolorem quis, exercitationem aperiam incidunt
-    et. Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur, possimus ipsam fugit nostrum sed
-    consequatur, nesciunt similique quis eaque atque labore culpa omnis voluptatum accusamus odit obcaecati ipsa
-    voluptates adipisci? Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae, illum provident atque fugiat
-    voluptates, tempore incidunt excepturi sunt aliquam reiciendis minus, accusantium fuga expedita culpa harum impedit
-    corrupti nihil sed.
-
+    <ul class="text-center">
+        {% for link in links %}
+        <li class="nav-link">{{link|safe}}</li>
+        {% endfor %}
+    </ul>
 </div>
 
 {% endblock %}

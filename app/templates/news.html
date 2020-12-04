@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}NFL News{% endblock %}
+
+{% block news_active %}active{% endblock %}
+
+{% block content %}
+
+<h1 class="display-4 text-center">Recent NFL News</h1>
+<hr>
+<table class="table table-striped table-dark">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col" class="text-center">Story</th>
+            <th scope="col" class="text-center">Source</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for news_item in news %}
+        <tr>
+            <td class="shadow-lg p-3 mb-5 rounded">{{news_item['link']|safe}}</td>
+            <td class="text-center">
+                {% if news_item['source'] %}
+                {{news_item['source']}}
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
