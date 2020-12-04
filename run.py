@@ -5,10 +5,6 @@ import espn.views
 import requests
 
 
-def split_link(link):
-    print(link)
-
-
 @app.route('/')
 def index():
     '''Displays the homepage'''
