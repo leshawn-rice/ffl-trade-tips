@@ -5,9 +5,9 @@ function setActiveLinkInNavbar() {
     '#' instead of the page address
   */
   $activeLink = $('.active').find('a');
-  $activeLink.attr('href', '#')
+  $activeLink.attr('href', '#');
 }
 
 $(() => {
-  setActiveLinkInNavbar()
+  setActiveLinkInNavbar();
 });

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}My Leagues{% endblock %}
+
+{% block leagues_active %}active{% endblock %}
+
+{% block content %}
+
+{% if leagues %}
+<div class="row justify-content-center">
+    {% for league in leagues %}
+    <div class="col-12 col-md-4 text-center">
+        <div class="row align-items-center justify-content-between">
+            <div class="col-6">
+                <h1 class="h3">{{league.league_id}}</h1>
+            </div>
+            <div class="col-6">
+                <a href="/leagues/{{league.id}}" class="btn btn-sm btn-success">Open League</a>
+            </div>
+        </div>
+        <table class="table table-striped">
+            <tr>
+                <td>Teams</td>
+                <td>{{league.num_teams}}</td>
+            </tr>
+            <tr>
+                <td>Owners</td>
+                <td>{{league.num_teams}}</td>
+            </tr>
+            <tr>
+                <td>Week</td>
+                <td>{{league.num_teams}}</td>
+            </tr>
+            <tr>
+                <td>Top Scorer</td>
+                <td>{{league.year}}</td>
+            </tr>
+            <tr>
+                <td>Teams</td>
+                <td>{{league.num_teams}}</td>
+            </tr>
+        </table>
+    </div>
+    {% endfor %}
+</div>
+
+{% endif %}
+<div class="row justify-content-center">
+    <button class="btn btn-danger">Add a League</button>
+</div>
+
+{% endblock %}

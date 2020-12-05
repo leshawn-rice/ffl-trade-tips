@@ -1,11 +1,11 @@
 {% extends 'html_base.html' %}
 
 {% block navbar %}
-<nav class="navbar sticky-top navbar-expand-lg navbar-light bg-danger justify-content-start p-0">
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-danger justify-content-start p-0">
     <p class="navbar-brand d-flex align-self-center font-weight-bold m-0 p-0">Fantasy Football Trade Tips</p>
     {% if session['logged_in'] %}
-    <a class="nav-link ml-auto text-dark" id="profile-phone" href="/profile"><i class="fas fa-user"></i></a>
-    <a class="nav-link ml-auto text-dark" id="settings-phone" href="/settings"><i class="fas fa-cog"></i></a>
+    <a class="nav-link ml-auto text-light" id="profile-phone" href="/profile"><i class="fas fa-user"></i></a>
+    <a class="nav-link ml-auto text-light" id="settings-phone" href="/settings"><i class="fas fa-cog"></i></a>
     {% endif %}
     <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbar-toggler"
         aria-controls="navbar-toggler" aria-expanded="false" aria-label="Toggle navigation">
@@ -14,10 +14,9 @@
     <div class="collapse navbar-collapse" id="navbar-toggler">
         <ul class="navbar-nav ml-4 mt-lg-0" id="navbar-left-items">
             <li class="nav-item {% block home_active %}{% endblock %} text-center">
-                <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="/">Home</a>
             </li>
-            {% if session['logged_in'] %}
-            </li>
+            {% if 'user_id' in session %}
             <li class="nav-item {% block leagues_active %}{% endblock %} text-center">
                 <a class="nav-link" href="/leagues">My Leagues</a>
             </li>
@@ -26,10 +25,10 @@
             </li>
         </ul>
         <ul class="navbar-nav ml-auto mt-lg-0" id="navbar-right-items">
-            <li class="nav-item text-center" id="profile-desktop">
+            <li class="nav-item" id="profile-desktop">
                 <a class="nav-link" href="/profile"><i class="fas fa-user"></i></a>
             </li>
-            <li class="nav-item text-center" id="settings-desktop">
+            <li class="nav-item" id="settings-desktop">
                 <a class="nav-link" href="/settings"><i class="fas fa-cog"></i></a>
             </li>
             {% else %}
@@ -41,9 +40,8 @@
     </div>
 </nav>
 {% endblock %}
-
 {% block footer %}
-
+<br><br><br><br>
 <footer class="footer bg-danger">
     <div class="row">
         <div class="col-4">

@@ -28,6 +28,10 @@ body {
   box-shadow: lightblue;
 }
 
+#profile-dropdown {
+  margin-right: 100vw;
+}
+
 #profile-phone {
   display: none;
 }
