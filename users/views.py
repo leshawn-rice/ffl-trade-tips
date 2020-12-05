@@ -9,7 +9,7 @@ form_handler = FormHandler()
 @app.route('/sign-out')
 def signout():
     '''Signs the current user out'''
-    session['logged_in'] = False
+    session.pop('user_id')
     return redirect('/')
 
 
@@ -21,7 +21,7 @@ def login():
     If login info is correct, redirects to homepage, otherwise
     displays the login form again.
     '''
-    if session.get('logged_in'):
+    if 'user_id' in session:
         return redirect('/')
 
     form = LoginForm()
@@ -44,7 +44,7 @@ def signup():
     If info is valid, redirects to homepage, otherwise
     displays the signup form again.
     '''
-    if session.get('logged_in'):
+    if 'user_id' in session:
         return redirect('/')
 
     session['username_taken'] = False
@@ -55,25 +55,11 @@ def signup():
     if form.validate_on_submit():
         user = form_handler.sign_up(form)
         if user:
-            return redirect('/get-league')
+            return redirect('/add-league')
         else:
             return render_template('signup_form.html', form=form)
     else:
         return render_template('signup_form.html', form=form)
-
-
-@app.route('/get-league', methods=['GET', 'POST'])
-def add_league():
-    form = AddLeagueForm()
-
-    if form.validate_on_submit():
-        league = form_handler.add_league(form)
-        if league:
-            return redirect('/')
-        else:
-            return render_template('add_league_form.html', form=form)
-    else:
-        return render_template('add_league_form.html', form=form)
 
 
 @app.route('/search-trade', methods=['GET', 'POST'])

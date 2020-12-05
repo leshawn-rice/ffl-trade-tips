@@ -8,6 +8,19 @@ function setActiveLinkInNavbar() {
   $activeLink.attr('href', '#');
 }
 
+function addLeagueBtn() {
+  try {
+    $btn = $('#add-league-btn')
+    $btn.click((event) => {
+      location.pathname = '/add-league'
+    });
+  }
+  catch (err) {
+    console.log('Not on right page!')
+  }
+}
+
 $(() => {
   setActiveLinkInNavbar();
+  addLeagueBtn();
 });
