@@ -1,10 +1,7 @@
-from flask import Flask, request, redirect, render_template, session, flash
+from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
-from app.database import db, connect_db
-from espn.models import TeamModel, PlayerModel
-from users.models import UserModel
-from forms.forms import CreateUserForm, LoginForm, SearchTradeForm, AddLeagueForm, SelectTeamForm
-from forms.handle_forms import FormHandler
+from app.database import connect_db
+
 
 # Trade logic:
 # A Players get A & B
@@ -22,7 +19,3 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 debug = DebugToolbarExtension(app)
 
 connect_db(app)
-
-
-if __name__ == "__main__":
-    app.run()
