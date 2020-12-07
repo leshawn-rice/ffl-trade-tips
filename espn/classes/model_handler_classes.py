@@ -8,7 +8,6 @@ class LeagueModelHandler(ModelHandlerBase):
         self.instance = current_instance
 
     def add_record(self):
-        print(self.instance.name)
         if self.instance.cookies:
             new_league = LeagueModel(
                 league_id=self.instance.id, user_id=self.instance.user_id, year=self.instance.year, espn_s2=espn_s2, swid=swid, num_teams=self.instance.num_teams, name=self.instance.name, week=self.instance.week)
