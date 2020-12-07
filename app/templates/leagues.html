@@ -12,7 +12,7 @@
     <div class="col-12 col-md-4 text-center">
         <div class="row align-items-center justify-content-between">
             <div class="col-6">
-                <h1 class="h3">{{league.league_id}}</h1>
+                <h1 class="h3">{{league.name}}</h1>
             </div>
             <div class="col-6">
                 <a href="/leagues/{{league.id}}" class="btn btn-sm btn-success">Open League</a>
@@ -29,15 +29,15 @@
             </tr>
             <tr>
                 <td>Week</td>
-                <td>{{league.num_teams}}</td>
+                <td>{{league.week}}</td>
             </tr>
             <tr>
                 <td>Top Scorer</td>
-                <td>{{league.year}}</td>
+                <td>{{league.top_scorer.team_name}}</td>
             </tr>
             <tr>
-                <td>Teams</td>
-                <td>{{league.num_teams}}</td>
+                <td>Bottom Scorer</td>
+                <td>{{league.bottom_scorer.team_name}}</td>
             </tr>
         </table>
     </div>

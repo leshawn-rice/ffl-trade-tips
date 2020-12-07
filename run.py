@@ -1,5 +1,6 @@
 from flask import render_template
 from app.app import app
+from app.database import refresh_tables
 import users.views
 import espn.views
 import requests

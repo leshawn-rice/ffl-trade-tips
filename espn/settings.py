@@ -7,6 +7,14 @@ POSITION_MAP = {
     25: 'Rookie'
 }
 
+GRADE_MAP = {
+    'A': ('B'),
+    'B': ('A', 'C'),
+    'C': ('B', 'D'),
+    'D': ('C', 'F'),
+    'F': ('D')
+}
+
 POSITIONS = list(set([pos for pos in POSITION_MAP.values()]))
 
 PRO_TEAM_MAP = {
@@ -25,20 +33,20 @@ ACTIVITY_MAP = {
 
 STATS_MAP = {
     # Offensive stats
-    3: "passing_yds", 4: "passing_tds", 19: "passing_2_pts", 20: "passing_interceptions",
-    24: "rushing_yds", 25: "rushing_tds", 26: "rushing_2_pts", 42: "receiving_yds",
-    43: "receiving_tds", 44: "receiving_2_pts", 53: "receiving_receptions", 72: "lost_fumbles",
+    3: 'Passing Yards', 4: 'Passing Touchdowns', 19: 'Passing 2 PT Conversions', 20: 'Passing Interceptions',
+    24: 'Rushing Yards', 25: 'Rushing Touchdowns', 26: 'Rushing 2 PT Conversions', 42: 'Lost Fumbles',
+    43: 'Receiving Touchdowns', 44: 'Receiving 2 PT Conversions', 53: 'Receiving Receptions', 72: 'Lost Fumbles',
     # Kicking stats
-    74: "made_fg_50_plus", 77: "made_fg_40_to_49", 80: "made_fg_under_40",
-    85: "missed_fgs", 86: "made_pats", 88: "missed_pats",
+    74: 'Made FGs From over 50 Yds', 77: 'Made FGs From 40-49 Yards', 80: 'Made FGs Under 40 Yards',
+    85: 'Missed FGs', 86: 'Made PATs', 88: 'Missed PATs',
     # Defensive stats
-    89: "d_0_pts", 90: "d_1_to_6_pts", 91: "d_7_to_13_pts",
-    92: "d_14_to_17_pts", 93: "d_blocked_kick_tds", 95: "d_interceptions",
-    96: "d_fumbles", 97: "d_blocked_kicks", 98: "d_safeties",
-    99: "d_sacks", 123: "d_28_to_34_pts", 124: "d_35_to_45_pts",
-    129: "d_100_to_199_yds", 130: "d_200_to_299_yds", 131: "d_300_to_349_yds",
-    132: "d_350_to_399_yds", 133: "d_400_to_449_yds", 134: "d_450_to_499_yds",
-    135: "d_500_to_549_yds", 136: "d_over_550_yds",
+    89: 'Allowed 0 Points', 90: 'Allowed 1-6 Points', 91: 'Allowed 7-13 Points',
+    92: 'Allowed 14-17 Points', 93: 'Defensive Blocked PATs', 95: 'Defensive Interceptions',
+    96: 'Defensive Fumbles', 97: 'Defensive Blocked Kicks', 98: 'Defensive Safeties',
+    99: 'Defensive Sacks', 123: 'Allowed 28-34 Points', 124: 'Allowed 35-45 Points',
+    129: 'Allowed 100-199 Yards', 130: 'Allowed 200-299 Yards', 131: 'Allowed 300-349 Yards',
+    132: 'Allowed 350-399 Yards', 133: 'Allowed 400-449 Yards', 134: 'Allowed 450-499 Yards',
+    135: 'Allowed 500-549 Yards', 136: 'Allowed Over 500 Yards',
     # Extra stats
-    155: "TeamWin", 171: "20-24pointLossMargin", 172: "25+pointLossMargin",
+    155: 'TeamWin', 171: '20-24pointLossMargin', 172: '25+pointLossMargin',
 }

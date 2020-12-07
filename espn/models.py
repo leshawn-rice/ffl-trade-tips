@@ -1,4 +1,5 @@
 from app.database import db
+from espn.settings import GRADE_MAP
 
 
 class LeagueModel(db.Model):
@@ -15,12 +16,35 @@ class LeagueModel(db.Model):
     year = db.Column(db.Integer, nullable=False)
     espn_s2 = db.Column(db.Text)
     swid = db.Column(db.Text)
+    name = db.Column(db.Text, nullable=False)
+    week = db.Column(db.Integer, nullable=False)
     num_teams = db.Column(db.Integer, nullable=False)
 
     players = db.relationship(
         'PlayerModel', backref='league')
     teams = db.relationship(
         'TeamModel', backref='league')
+
+    def get_top_team(self):
+        most_points = 0
+        top_team = None
+        for team in self.teams:
+            if team.points > most_points:
+                most_points = team.points
+                top_team = team
+        return top_team
+
+    def get_bottom_team(self):
+        least_points = 100000
+        bottom_team = None
+        for team in self.teams:
+            if team.points < least_points:
+                least_points = team.points
+                bottom_team = team
+        return bottom_team
+
+    top_scorer = property(get_top_team)
+    bottom_scorer = property(get_bottom_team)
 
 
 class TeamModel(db.Model):
@@ -41,6 +65,7 @@ class TeamModel(db.Model):
     logo_url = db.Column(db.Text)
     record = db.Column(db.Text)
     waiver_position = db.Column(db.Integer)
+    points = db.Column(db.Float)
 
     players = db.relationship(
         'PlayerModel', backref='team')
@@ -83,6 +108,14 @@ class PlayerModel(db.Model):
 
     stats = db.relationship(
         'PlayerStatModel', cascade='all, delete', backref='player')
+
+    @classmethod
+    def get_trade_recs(cls, player):
+        grades_to_check = GRADE_MAP[player.grade]
+        matching_players = cls.query.filter(
+            cls.grade in grades_to_check, cls.position == player.position)  # prolly wont work lol
+
+        return matching_players
 
     def __repr__(self):
         return f'<PlayerModel id={self.id} team_id={self.team_id} league_id={self.league_id} name={self.full_name} grade={self.grade}>'

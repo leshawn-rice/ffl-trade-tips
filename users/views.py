@@ -2,8 +2,10 @@ from flask import redirect, render_template, session
 from app.app import app
 from forms.forms import LoginForm, CreateUserForm, AddLeagueForm, SearchTradeForm
 from forms.handle_forms import FormHandler
+from users.auth import UserAuthentication
 
 form_handler = FormHandler()
+authentication = UserAuthentication()
 
 
 @app.route('/sign-out')
@@ -27,7 +29,7 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = form_handler.log_in(form)
+        user = authentication.log_in(form)
         if user:
             return redirect('/')
         else:
@@ -47,13 +49,16 @@ def signup():
     if 'user_id' in session:
         return redirect('/')
 
-    session['username_taken'] = False
-    session['email_taken'] = False
+    if session.get('username_taken'):
+        session.pop('username_taken')
+
+    if session.get('email_taken'):
+        session.pop('email_taken')
 
     form = CreateUserForm()
 
     if form.validate_on_submit():
-        user = form_handler.sign_up(form)
+        user = authentication.sign_up(form)
         if user:
             return redirect('/add-league')
         else:

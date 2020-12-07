@@ -7,11 +7,11 @@ from espn.settings import PRO_TEAM_MAP, STATS_MAP, POSITION_MAP, STANDARD_SEASON
 
 
 class League(ESPNBase):
-    def __init__(self, league_id, year, user, cookies=None):
+    def __init__(self, league_id, year, user_id, cookies=None):
         self.id = league_id
         self.year = year
         self.cookies = cookies
-        self.user_id = user.id
+        self.user_id = user_id
         self.league_info = {'league_model_id': None, 'league_id': self.id,
                             'year': self.year, 'cookies': self.cookies}
         self.create_league()
@@ -24,6 +24,8 @@ class League(ESPNBase):
         super().__init__()
         data = self.make_espn_request()
         name = data['settings']['name']
+        self.week = data['scoringPeriodId']
+        return name
 
     def get_num_teams(self):
         self.num_teams = 0
@@ -70,6 +72,7 @@ class Team(ESPNBase):
         self.location = data['location']
         self.nickname = data['nickname']
         self.logo_url = data['logo']
+        self.points = data['points']
         wins = data['record']['overall']['wins']
         losses = data['record']['overall']['losses']
         self.record = f'{wins}-{losses}'

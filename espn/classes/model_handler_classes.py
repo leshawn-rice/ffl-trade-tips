@@ -8,36 +8,37 @@ class LeagueModelHandler(ModelHandlerBase):
         self.instance = current_instance
 
     def add_record(self):
+        print(self.instance.name)
         if self.instance.cookies:
             new_league = LeagueModel(
-                league_id=self.instance.id, user_id=self.instance.user_id, year=self.instance.year, espn_s2=espn_s2, swid=swid, num_teams=self.instance.num_teams)
+                league_id=self.instance.id, user_id=self.instance.user_id, year=self.instance.year, espn_s2=espn_s2, swid=swid, num_teams=self.instance.num_teams, name=self.instance.name, week=self.instance.week)
         else:
             new_league = LeagueModel(
-                league_id=self.instance.id, user_id=self.instance.user_id, year=self.instance.year, num_teams=self.instance.num_teams)
+                league_id=self.instance.id, user_id=self.instance.user_id, year=self.instance.year, num_teams=self.instance.num_teams, name=self.instance.name, week=self.instance.week)
 
         add_to_db(new_league)
         self.instance.league_info['league_model_id'] = new_league.id
 
     def update_league_info(self, league):
-        league.year = self.instance.year
-        league.num_teams = self.instance.num_teams
+        league.name = self.instance.name
+        league.week = self.instance.week
         league.year = self.instance.year
         league.num_teams = self.instance.num_teams
         league.espn_s2 = self.instance.league_info.get('espn_s2')
         league.swid = self.instance.league_info.get('swid')
+        db.session.commit()
 
     def update_record(self):
         league = LeagueModel.query.filter_by(
             league_id=self.instance.id, user_id=self.instance.user_id)
         self.update_league_info(league)
-        db.session.commit()
         self.instance.league_info['league_model_id'] = record.id
 
     def check_for_record_update(self):
         record = LeagueModel.query.filter_by(
             league_id=self.instance.id, user_id=self.instance.user_id).first()
 
-        if (record.year == self.instance.year) and (record.num_teams == self.instance.num_teams):
+        if (record.year == self.instance.year) and (record.num_teams == self.instance.num_teams) and (record.name == self.instance.name) and (record.week == self.instance.week):
             self.instance.league_info['league_model_id'] = record.id
             return False
         else:
@@ -58,7 +59,7 @@ class TeamModelHandler(ModelHandlerBase):
 
     def add_record(self):
         new_team = TeamModel(team_id=self.instance.id, league_id=self.instance.league_id, accronym=self.instance.accronym,
-                             location=self.instance.location, nickname=self.instance.nickname, logo_url=self.instance.logo_url, record=self.instance.record, waiver_position=self.instance.waiver_position)
+                             location=self.instance.location, nickname=self.instance.nickname, logo_url=self.instance.logo_url, record=self.instance.record, waiver_position=self.instance.waiver_position, points=self.instance.points)
         add_to_db(new_team)
 
         for stat, val in self.instance.stats.items():
@@ -78,6 +79,7 @@ class TeamModelHandler(ModelHandlerBase):
                 new_stat = TeamStatModel(
                     team_id=new_team.id, league_id=self.instance.league_id, stat_name=stat, stat_val=value)
                 db.session.add(new_stat)
+        db.session.commit()
 
     def update_team_info(self, team):
         team.acronym = self.instance.acronym
@@ -86,6 +88,8 @@ class TeamModelHandler(ModelHandlerBase):
         team.logo_url = self.instance.logo_url
         team.record = self.instance.record
         team.waiver_position = self.instance.waiver_position
+        team.points = self.instance.points
+        db.session.commit()
 
     def update_record(self):
         team = TeamModel.query.filter_by(
@@ -94,12 +98,11 @@ class TeamModelHandler(ModelHandlerBase):
         stat_records = TeamStatModel.query.filter_by(
             team_id=self.instance.id, league_id=self.instance.league_id).all()
         self.update_team_stats()
-        db.session.commit()
 
     def check_for_record_update(self):
         record = TeamModel.query.filter_by(
             team_id=self.instance.id, league_id=self.instance.league_id).first()
-        if (record.accronym == self.instance.accronym and record.location == self.instance.location and record.nickname == self.instance.nickname) and (record.logo_url == self.instance.logo_url and record.record == self.instance.record and record.waiver_position == self.instance.waiver_position):
+        if (record.accronym == self.instance.accronym and record.location == self.instance.location and record.nickname == self.instance.nickname) and (record.logo_url == self.instance.logo_url and record.record == self.instance.record and record.waiver_position == self.instance.waiver_position) and (record.points == self.instance.points):
             return False
         else:
             return True

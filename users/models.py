@@ -11,9 +11,9 @@ class UserModel(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(20), nullable=False, unique=True)
+    username = db.Column(db.Text, nullable=False, unique=True)
     email = db.Column(db.Text, nullable=False, unique=True)
-    password = db.Column(db.Text, nullable=False)
+    password = db.Column(db.Binary(80), nullable=False)
 
     leagues = db.relationship(
         'LeagueModel', cascade='all, delete', backref='user')
