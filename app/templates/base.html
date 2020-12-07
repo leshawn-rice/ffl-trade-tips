@@ -3,9 +3,11 @@
 {% block navbar %}
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-danger justify-content-start p-0">
     <p class="navbar-brand d-flex align-self-center font-weight-bold m-0 p-0">Fantasy Football Trade Tips</p>
-    {% if session['logged_in'] %}
-    <a class="nav-link ml-auto text-light" id="profile-phone" href="/profile"><i class="fas fa-user"></i></a>
-    <a class="nav-link ml-auto text-light" id="settings-phone" href="/settings"><i class="fas fa-cog"></i></a>
+    {% if 'user_id' in session %}
+    <a class="nav-link ml-auto text-light" id="profile-phone" href="/profile"><i class="fas fa-user"
+            data-toggle="tooltip" data-placement="bottom" title="Profile"></i></a>
+    <a class="nav-link ml-auto text-light" id="settings-phone" href="/sign-out"><i class="fas fa-sign-out-alt"
+            data-toggle="tooltip" data-placement="bottom" title="Sign Out"></i></a>
     {% endif %}
     <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbar-toggler"
         aria-controls="navbar-toggler" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,10 +28,12 @@
         </ul>
         <ul class="navbar-nav ml-auto mt-lg-0" id="navbar-right-items">
             <li class="nav-item" id="profile-desktop">
-                <a class="nav-link" href="/profile"><i class="fas fa-user"></i></a>
+                <a class="nav-link" href="/profile"><i class="fas fa-user" data-toggle="tooltip" data-placement="bottom"
+                        title="Profile"></i></a>
             </li>
             <li class="nav-item" id="settings-desktop">
-                <a class="nav-link" href="/settings"><i class="fas fa-cog"></i></a>
+                <a class="nav-link" href="/sign-out" data-toggle="tooltip" data-placement="bottom" title="Sign Out"><i
+                        class="fas fa-sign-out-alt"></i></a>
             </li>
             {% else %}
             <li class="nav-item {% block log_sign_active %}{% endblock %} text-center">

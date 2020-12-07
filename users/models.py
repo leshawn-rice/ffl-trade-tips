@@ -13,7 +13,7 @@ class UserModel(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.Text, nullable=False, unique=True)
     email = db.Column(db.Text, nullable=False, unique=True)
-    password = db.Column(db.Binary(80), nullable=False)
+    password = db.Column(db.Text, nullable=False)
 
     leagues = db.relationship(
         'LeagueModel', cascade='all, delete', backref='user')

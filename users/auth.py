@@ -16,15 +16,15 @@ class UserAuthentication:
         given password
         '''
         hashed_password = bcrypt.generate_password_hash(
-            password.encode('utf-8'))
-        return hashed_password
+            password)
+        return hashed_password.decode('utf8')
 
     def compare_passwords(self, hashed_password, password):
         '''
         Compares the hashed password to the plain text password,
         returns True if they match, otherwise returns False
         '''
-        return bcrypt.check_password_hash(hashed_password, password.encode('utf-8'))
+        return bcrypt.check_password_hash(hashed_password, password)
 
     def verify_password_match(self, password, confirm_password):
         '''
