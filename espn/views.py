@@ -34,10 +34,6 @@ def add_league():
 def show_leagues():
     if 'user_id' not in session:
         return redirect('/login')
-    for pos in POSITIONS:
-        pos_max = session.get(f'{pos}_max')
-        pos_min = session.get(f'{pos}_min')
-        print(f'{pos} MAX: {pos_max} MIN: {pos_min}')
     user = UserModel.query.get(session['user_id'])
     leagues = user.leagues
     return render_template('leagues.html', leagues=leagues)
