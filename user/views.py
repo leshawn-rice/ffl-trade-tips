@@ -1,9 +1,19 @@
 from flask import redirect, render_template, session
 from app.app import app
-from app.forms import LoginForm, CreateUserForm, AddLeagueForm, SearchTradeForm
+from app.forms import LoginForm, CreateUserForm, AddLeagueForm
 from user.auth import UserAuthentication
+from user.models import UserModel
 
 authentication = UserAuthentication()
+
+
+@app.route('/profile')
+def profile_page():
+    if 'user_id' not in session:
+        return redirect('/')
+    user_id = session.get('user_id')
+    user = UserModel.query.get_or_404(user_id)
+    return render_template('profile.html', user=user)
 
 
 @app.route('/sign-out')

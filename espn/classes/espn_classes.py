@@ -73,6 +73,7 @@ class Team(ESPNBase):
         self.nickname = data['nickname']
         self.logo_url = data['logo']
         self.points = data['points']
+        self.points = round(self.points, 2)
         wins = data['record']['overall']['wins']
         losses = data['record']['overall']['losses']
         self.record = f'{wins}-{losses}'
@@ -144,8 +145,10 @@ class Player(ESPNBase):
 
         stat_block = [x for x in data['stats'] if x['id'] == year_id][0]
         self.points = stat_block['appliedTotal']
+        self.points = round(self.points, 2)
         self.point_avg = stat_block['appliedAverage']
         self.projected_points = self.point_avg * STANDARD_SEASON_LENGTH
+        self.projected_points = round(self.projected_points, 2)
 
         stats_to_check = stat_block['appliedStats'] if stat_block.get(
             'appliedStats') else stat_block['stats']

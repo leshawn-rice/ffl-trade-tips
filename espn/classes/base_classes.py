@@ -57,4 +57,4 @@ class ESPNBase:
             stat = int(stat)
             stat_name = STATS_MAP.get(stat)
             if stat_name:
-                self.stats[stat_name] = val
+                self.stats[stat_name] = round(val, 2)

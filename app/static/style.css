@@ -46,11 +46,23 @@ body {
   display: inline;
 }
 
+#teams-table-phone {
+  display: none;
+}
+
+
 @media only screen and (max-width: 600px) {
   #profile-phone {
     display: inline;
   }
   #profile-desktop {
+    display: none;
+  }
+
+  #teams-table-phone {
+    display: block;
+  }
+  #teams-table-desktop {
     display: none;
   }
 

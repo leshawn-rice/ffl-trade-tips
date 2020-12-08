@@ -1,6 +1,9 @@
-from app.database import add_to_db
+from app.database import db, add_to_db
 from espn.classes.base_classes import ModelHandlerBase
+from espn.classes.grade_class import GradeCalculator
 from espn.models import LeagueModel, TeamModel, TeamStatModel, PlayerModel, PlayerStatModel
+
+grade_calc = GradeCalculator()
 
 
 class LeagueModelHandler(ModelHandlerBase):
@@ -81,7 +84,7 @@ class TeamModelHandler(ModelHandlerBase):
         db.session.commit()
 
     def update_team_info(self, team):
-        team.acronym = self.instance.acronym
+        team.acronym = self.instance.accronym
         team.location = self.instance.location
         team.nickname = self.instance.nickname
         team.logo_url = self.instance.logo_url
@@ -96,7 +99,7 @@ class TeamModelHandler(ModelHandlerBase):
         self.update_team_info(team)
         stat_records = TeamStatModel.query.filter_by(
             team_id=self.instance.id, league_id=self.instance.league_id).all()
-        self.update_team_stats()
+        self.update_team_stats(stat_records)
 
     def check_for_record_update(self):
         record = TeamModel.query.filter_by(
@@ -130,17 +133,20 @@ class PlayerModelHandler(ModelHandlerBase):
             add_to_db(new_stat)
 
     def update_player_stats(self, stat_records):
+        player_id = PlayerModel.query.filter_by(
+            player_id=self.instance.id, league_id=self.instance.league_id).first().id
         stat_names = []
         for stat in stat_records:
             stat_names.append(stat.stat_name)
             if stat.stat_name in self.instance.stats.keys():
                 stat.stat_value = self.instance.stats[stat.stat_name]
 
-        for stat in self.instance.stats.keys():
+        for stat, val in self.instance.stats.items():
             if stat not in stat_names:
                 new_stat = PlayerStatModel(
-                    player_id=new_team.id, league_id=self.instance.league_id, stat_name=stat, stat_val=value)
+                    player_id=player_id, league_id=self.instance.league_id, stat_name=stat, stat_value=val)
                 db.session.add(new_stat)
+        db.session.commit()
 
     def update_player_info(self, player):
         player.team_id = self.instance.team_id
@@ -150,17 +156,17 @@ class PlayerModelHandler(ModelHandlerBase):
         player.position = self.instance.position
         player.position_rank = self.instance.rank
         player.points = self.instance.points
-        player.projected_points = self.instance.points
+        player.projected_points = self.instance.projected_points
+        player.grade = grade_calc.grade_player(player)
+        db.session.commit()
 
     def update_record(self):
         player = PlayerModel.query.filter_by(
-            player_id=self.instance.id, league_id=self.instance.league_id)
+            player_id=self.instance.id, league_id=self.instance.league_id).first()
         self.update_player_info(player)
-        db.session.commit()
         stat_records = PlayerStatModel.query.filter_by(
             player_id=self.instance.id, league_id=self.instance.league_id).all()
         self.update_player_stats(stat_records)
-        db.session.commit()
 
     def check_for_record_update(self):
         record = PlayerModel.query.filter_by(

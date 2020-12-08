@@ -8,11 +8,11 @@ POSITION_MAP = {
 }
 
 GRADE_MAP = {
-    'A': ('B'),
-    'B': ('A', 'C'),
-    'C': ('B', 'D'),
-    'D': ('C', 'F'),
-    'F': ('D')
+    'A': ('A', 'B'),
+    'B': ('A', 'B', 'C'),
+    'C': ('B', 'C', 'D'),
+    'D': ('C', 'D' 'F'),
+    'F': ('D', 'F')
 }
 
 POSITIONS = list(set([pos for pos in POSITION_MAP.values()]))

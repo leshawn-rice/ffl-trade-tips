@@ -14,6 +14,7 @@ class GradeCalculator:
         self.positions = POSITIONS
         self.cap = 1
         self.weight = 0.05
+        self.ppr = None
 
         self.grade_ranges = {
             'QB': {
@@ -120,11 +121,20 @@ class GradeCalculator:
         else:
             session[f'{player.position}_min'] = score
 
+    def get_ppr(self):
+        self.ppr = session.get('PPR')
+        if self.ppr:
+            self.ppr = 1
+        else:
+            self.ppr = 0.5
+        self.stat_scores['Receiving Receptions'] = self.ppr
+
     def grade_player(self, player):
         '''
         Takes a player, and assigns them
         a letter grade based on their stats
         '''
+        self.get_ppr()
         stats = player.stats
         total = 0
 

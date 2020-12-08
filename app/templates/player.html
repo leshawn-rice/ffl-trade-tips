@@ -2,21 +2,83 @@
 
 {% block title %}{{player.full_name}}{% endblock %}
 
+
 {% block content %}
 
-
-<div class="row my-2 justify-content-center">
-    <div class="col-12 col-md-4">
-        <div class="card bg-dark text-light">
-            <div class="card-header text-center">{{player.full_name}}</div>
-            <div class="card-body text-center">
-                <img class="img-fluid"
-                    src="https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/{{player.player_id}}.png&w=200&h=200&cb=1"
-                    alt="{{player.full_name}} Picture">
-            </div>
-            <div class="card-footer text-center">
-                <a href="/players/{{player.id}}/stats" class="btn btn-success">Stats!</a>
-            </div>
+<div class="row">
+    <div class="col-12 col-md-2 d-flex justify-content-center">
+        <img class="img-fluid shadow mb-5 rounded"
+            src="https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/{{player.player_id}}.png&w=426&h=310&cb=1"
+            alt="{{player.full_name}} logo" width=200 height=200>
+    </div>
+    <div class="col-10">
+        <a class="btn btn-warning mt-2" href="/teams/{{player.team.id}}">Back to {{player.team.team_name}}</a>
+        <h1 class="display-1 text-center">{{player.full_name}}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 col-md-6">
+        <h2 class="display-4 text-center">Stats</h2>
+        <table class="table table-striped">
+            <thead class="bg-danger text-light">
+                <tr>
+                    <th>Stat Name</th>
+                    <th>Stat Value</th>
+                </tr>
+            </thead>
+            <hr>
+            <tbody>
+                <tr>
+                    <td>Overall Grade
+                        {% if player.grade == 'F' or player.grade == 'D' %}
+                        <span class="badge badge-danger">Trade Suggested!</span>
+                        {% elif player.grade == 'A' %}
+                        <span class="badge badge-success">Player Okay!</span>
+                        {% endif %}
+                    </td>
+                    <td>{{player.grade}}</td>
+                </tr>
+                {% for stat in player.stats %}
+                {% if stat.stat_value != 0 %}
+                <tr>
+                    <td>{{stat.stat_name}}</td>
+                    <td>{{stat.stat_value}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-12 col-md-6">
+        <h2 class="display-4 text-center">Trade Suggestions</h2>
+        <div class="text-center">
+            {% if trade_suggestions %}
+            <table class="table table-striped">
+                <thead class="bg-danger text-light">
+                    <tr>
+                        <th>Player Name</th>
+                        <th>Player Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{player.full_name}}<span class="badge badge-success"> Current</span></td>
+                        <td>{{player.grade}}</td>
+                    </tr>
+                    {% for trade_player in trade_suggestions %}
+                    <tr>
+                        <td><a class="bg-secondary rounded"
+                                href="/players/{{trade_player.id}}">{{trade_player.full_name}}</a></td>
+                        <td>{{trade_player.grade}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+            <form action="" method="POST">
+                <input type="text" name="player_grade" value="{{player.grade}}" hidden>
+                <button class="btn btn-success text-center">Get Trade Suggestions</button>
+            </form>
         </div>
     </div>
 </div>

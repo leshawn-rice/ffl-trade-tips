@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}{{team.team_name}}{% endblock %}
+
+
+{% block content %}
+
+<div class="row">
+    <div class="col-12 col-md-2 d-flex justify-content-center">
+        <img class="img-fluid shadow mb-5 rounded" src="{{team.logo_url}}" alt="{{team.team_name}} logo" width=200
+            height=200>
+    </div>
+    <div class="col-10">
+        <a class="btn btn-warning mt-2" href="/leagues/{{team.league.id}}">Back to {{team.league.name}}</a>
+        <h1 class="display-1 text-center">{{team.team_name}}</h1>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 col-md-6">
+        <h2 class="display-4">Players</h2>
+        <table class="table table-striped">
+            <thead class="bg-danger text-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>NFL Team</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in team.players %}
+                <tr>
+                    <td><a class="bg-secondary rounded" href="/players/{{player.id}}">{{player.full_name}}</a></td>
+                    <td>{{player.position}}</td>
+                    <td>{{player.pro_team}}</td>
+                    <td>{{player.points}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-12 col-md-6">
+        <h2 class="display-4">Stats</h2>
+        <table class="table table-striped">
+            <thead class="bg-danger text-light">
+                <tr>
+                    <th>Stat Name</th>
+                    <th>Stat Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stat in team.stats %}
+                {% if stat.stat_value != 0 %}
+                <tr>
+                    <td>{{stat.stat_name}}</td>
+                    <td>{{stat.stat_value}}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
