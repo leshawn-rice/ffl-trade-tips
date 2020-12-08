@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, IntegerField, BooleanField
+from wtforms import StringField, PasswordField, IntegerField, BooleanField, TextAreaField
 from wtforms.validators import InputRequired, Email, Regexp, NumberRange, Optional, EqualTo
 from espn.settings import POSITIONS
 
@@ -46,3 +46,20 @@ class AddLeagueForm(FlaskForm):
     year = IntegerField('Year', validators=[InputRequired(
         message='You must enter a year!'), NumberRange(min=2000, max=2021)])
     is_ppr = BooleanField('PPR', validators=[Optional()])
+
+
+class ContactForm(FlaskForm):
+    '''
+    Form for creating a new user
+    Fields:
+            email, username, password
+    Validation:
+                All inputs required, password must be 8+ characters with one or more upper/lower case 
+                letters and one or more numbers
+
+    '''
+    # Add validation for username length (no more than 20 per db)
+    email = StringField('Email', validators=[InputRequired(
+        message='Email cannot be blank!'), Email(message='Invalid Email!')])
+    message = TextAreaField('Message', validators=[
+        InputRequired(message='Message cannot be blank!')])

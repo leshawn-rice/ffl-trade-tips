@@ -1,10 +1,138 @@
 {% extends 'base.html' %}
 
-{% block title %}About Us{% endblock %}
+{% block title %}About{% endblock %}
 
 
 {% block content %}
 
-<h1 class="display-1">About</h1>
+<h1 class="display-1 text-center">About This Project</h1>
+
+<div class="row">
+    <div class="col-12 text-center">
+        <p class="lead">Fantasy Football Trade Tips is my first Capstone project for Springboard's Software Engineering
+            Track.</p>
+        <h2 class="display-4">Challenges</h2>
+        <p class="lead">Some of the main challenges in undertaking this project were: </p>
+        <p class="lead">1. The ESPN API does not have any official documentation. All endpoints used in this project
+            were discovered either through trial and error or by reading through the codebase of another project that
+            uses the API. This challenge helped me:</p>
+        <ul>
+            <li>Solidify the importance of documentation.</li>
+            <li>Enhance my ability to quickly understand the purpose behind another programmers code.</li>
+        </ul>
+        <p class="lead">2. This project required the development of an algorithm to rank and grade NFL players based on
+            their current performance. I had to decide on a method to rank the players, and then come up with a way to
+            scale that ranking so that players are graded based on their overall performance and the performance of
+            other players at their position. This challenge helped me:</p>
+        <ul>
+            <li>Develop an understanding of how to go about building an algorithm around real-world data</li>
+            <li>Enhance my ability to identify and make readily available different pieces of data in an HTTP context
+            </li>
+        </ul>
+        <br><br>
+        <p class="lead">Here is a breakdown of what dependencies were used in the creation of this project:</p>
+
+
+        <hr>
+        <h2 class="display-3">Frontend</h2>
+        <hr>
+
+        <h3 class="display-4">CSS Framework</h3>
+        <table class="table table-striped table-danger">
+            <thead>
+                <tr>
+                    <th>Framework</th>
+                    <th>Version</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Bootstrap</td>
+                    <td>4.5.3</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3 class="display-4">Libraries</h3>
+        <table class="table table-striped table-danger">
+            <thead>
+                <tr>
+                    <th>Library</th>
+                    <th>Version</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>jQuery</td>
+                    <td>3.5.1</td>
+                </tr>
+                <tr>
+                    <td>Font Awesome</td>
+                    <td>5.15.1</td>
+                </tr>
+            </tbody>
+        </table>
+        <hr>
+        <h2 class="display-3">Backend</h2>
+        <hr>
+
+        <h3 class="display-4">Database</h3>
+        <table class="table table-striped table-danger">
+            <thead>
+                <tr>
+                    <th>ORDBMS</th>
+                    <th>Version</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>PostgreSQL</td>
+                    <td>12.5</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3 class="display-4">Web Framework</h3>
+        <table class="table table-striped table-danger">
+            <thead>
+                <tr>
+                    <th>Framework</th>
+                    <th>Version</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Flask</td>
+                    <td>1.1.2</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3 class="display-4">Libraries</h3>
+        <table class="table table-striped table-danger">
+            <thead>
+                <tr>
+                    <th>Library</th>
+                    <th>Version</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Flask-WTForms</td>
+                    <td>0.14.3</td>
+                </tr>
+                <tr>
+                    <td>Flask-BCrypt</td>
+                    <td>0.7.1</td>
+                </tr>
+                <tr>
+                    <td>Flask-SQLAlchemy</td>
+                    <td>2.4.4</td>
+                </tr>
+                <tr>
+                    <td>Flask-Mail</td>
+                    <td>0.9.1</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 {% endblock %}
