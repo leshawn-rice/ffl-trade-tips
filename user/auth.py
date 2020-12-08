@@ -3,7 +3,7 @@ from flask_bcrypt import Bcrypt
 from app.database import add_to_db
 from espn.classes.base_classes import ESPNRequest
 from espn.classes.espn_classes import League
-from users.models import UserModel
+from user.models import UserModel
 
 
 bcrypt = Bcrypt()

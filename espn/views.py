@@ -1,9 +1,9 @@
 from flask import render_template, redirect, session
 from app.app import app
 from espn.classes.news_class import News
-from users.models import UserModel
-from users.auth import UserAuthentication
-from forms.forms import AddLeagueForm
+from user.models import UserModel
+from user.auth import UserAuthentication
+from app.forms import AddLeagueForm
 from espn.settings import POSITIONS
 
 authentication = UserAuthentication()
@@ -25,9 +25,9 @@ def add_league():
         if league:
             return redirect('/')
         else:
-            return render_template('add_league_form.html', form=form)
+            return render_template('add_league.html', form=form)
     else:
-        return render_template('add_league_form.html', form=form)
+        return render_template('add_league.html', form=form)
 
 
 @app.route('/leagues')
@@ -36,4 +36,4 @@ def show_leagues():
         return redirect('/login')
     user = UserModel.query.get(session['user_id'])
     leagues = user.leagues
-    return render_template('leagues.html', leagues=leagues)
+    return render_template('all_leagues.html', leagues=leagues)

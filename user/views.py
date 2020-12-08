@@ -1,10 +1,8 @@
 from flask import redirect, render_template, session
 from app.app import app
-from forms.forms import LoginForm, CreateUserForm, AddLeagueForm, SearchTradeForm
-from forms.handle_forms import FormHandler
-from users.auth import UserAuthentication
+from app.forms import LoginForm, CreateUserForm, AddLeagueForm, SearchTradeForm
+from user.auth import UserAuthentication
 
-form_handler = FormHandler()
 authentication = UserAuthentication()
 
 
@@ -33,9 +31,9 @@ def login():
         if user:
             return redirect('/')
         else:
-            return render_template('login_form.html', form=form)
+            return render_template('login.html', form=form)
     else:
-        return render_template('login_form.html', form=form)
+        return render_template('login.html', form=form)
 
 
 @app.route('/sign-up', methods=['GET', 'POST'])
@@ -62,23 +60,6 @@ def signup():
         if user:
             return redirect('/add-league')
         else:
-            return render_template('signup_form.html', form=form)
+            return render_template('signup.html', form=form)
     else:
-        return render_template('signup_form.html', form=form)
-
-
-@app.route('/search-trade', methods=['GET', 'POST'])
-def search():
-    '''
-    Displays a form to search for players.
-    Includes both free agents and owned players.
-    Displays players that match the search query
-    on the page
-    '''
-    form = SearchTradeForm()
-
-    if form.validate_on_submit():
-        players = form_handler.search_player(form)
-        return render_template('search_players.html', players=players, form=form)
-    else:
-        return render_template('search_players.html', form=form)
+        return render_template('signup.html', form=form)
