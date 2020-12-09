@@ -15,7 +15,7 @@ class League(ESPNBase):
         self.cookies = cookies
         self.user_id = user_id
         self.league_info = {'league_model_id': None, 'league_id': self.id,
-                            'year': self.year, 'cookies': self.cookies}
+                            'year': self.year, 'cookies': self.cookies, 'user_id': self.user_id}
         self.create_league()
 
     def get_basic_info(self):
@@ -66,6 +66,7 @@ class Team(ESPNBase):
 
     def __init__(self, data, league_info):
         self.league_info = league_info
+        self.user_id = league_info.get('user_id')
         self.roster = set()
         self.create_team(data)
 
@@ -89,8 +90,10 @@ class Team(ESPNBase):
 
     def create_player(self, player):
         player_data = player['playerPoolEntry']['player'] if 'playerPoolEntry' in player else player['player']
+        team_id = TeamModel.query.filter_by(
+            team_id=self.id, league_id=self.league_id, user_id=self.user_id).first().id
         new_player = Player(
-            data=player_data, league_info=self.league_info, team_id=self.id)
+            data=player_data, league_info=self.league_info, team_id=team_id)
         self.roster.add(new_player)
 
     def get_roster(self):

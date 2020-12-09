@@ -97,6 +97,8 @@ def player_page(player_id):
     if 'user_id' not in session:
         return redirect('/login')
     player = PlayerModel.query.get_or_404(player_id)
+    print(player)
+    print(player.league)
     league = player.league
     if league.user_id == session.get('user_id'):
         trade_suggestions = get_trade_suggestions(player)

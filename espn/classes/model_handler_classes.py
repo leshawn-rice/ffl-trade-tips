@@ -61,7 +61,7 @@ class TeamModelHandler(ModelHandlerBase):
 
     def add_record(self):
         new_team = TeamModel(team_id=self.instance.id, league_id=self.instance.league_id, accronym=self.instance.accronym,
-                             location=self.instance.location, nickname=self.instance.nickname, logo_url=self.instance.logo_url, record=self.instance.record, waiver_position=self.instance.waiver_position, points=self.instance.points)
+                             location=self.instance.location, nickname=self.instance.nickname, logo_url=self.instance.logo_url, record=self.instance.record, waiver_position=self.instance.waiver_position, points=self.instance.points, user_id=self.instance.user_id)
         add_to_db(new_team)
 
         for stat, val in self.instance.stats.items():

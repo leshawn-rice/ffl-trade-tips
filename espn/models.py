@@ -59,6 +59,8 @@ class TeamModel(db.Model):
     team_id = db.Column(db.Integer, nullable=False)
     league_id = db.Column(db.Integer, db.ForeignKey(
         'leagues.id', ondelete='cascade'))
+    user_id = db.Column(db.Integer, db.ForeignKey(
+        'users.id', ondelete='cascade'))
     accronym = db.Column(db.Text)
     location = db.Column(db.Text)
     nickname = db.Column(db.Text)
@@ -107,7 +109,7 @@ class PlayerModel(db.Model):
     grade = db.Column(db.Text)
 
     stats = db.relationship(
-        'PlayerStatModel', cascade='all, delete', backref='player')
+        'PlayerStatModel', backref='player')
 
     @classmethod
     def get_trade_recs(cls, player):

@@ -16,4 +16,5 @@ class UserModel(db.Model):
     password = db.Column(db.Text, nullable=False)
 
     leagues = db.relationship(
-        'LeagueModel', cascade='all, delete', backref='user')
+        'LeagueModel', backref='user')
+    teams = db.relationship('TeamModel', backref='user')

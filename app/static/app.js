@@ -39,6 +39,11 @@ function addDeleteAccountAlert() {
   });
 }
 
+function addLoadingScreen() {
+  $content = $('.container-fluid')
+  $addLeagueBtn = $('#add-league-btn')
+}
+
 $(() => {
   setActiveLinkInNavbar();
   setAddLeagueBtnLink();
