@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, flash, redirect
 from app.secrets import email_username
 from flask_mail import Mail, Message
 from app.app import app
@@ -29,16 +29,20 @@ def index():
 
 @app.route('/about')
 def about_page():
+    '''Renders the About Page'''
     return render_template('about.html')
 
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact_page():
+    '''Renders the Contact Page'''
     form = ContactForm()
     if form.validate_on_submit():
         sender = form.email.data
         message = form.message.data
         send_email(sender=sender, message=message)
+        flash('Email Sent!', 'success')
+        return redirect('/')
     return render_template('contact.html', form=form)
 
 

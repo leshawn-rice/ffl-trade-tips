@@ -4,7 +4,52 @@
 
 
 {% block content %}
+<p hidden id='user-id'>{{user.id}}</p>
 
-<h1 class="display-1">{{user.username}}</h1>
+<div class="row">
+    <div class="col-0 col-md-3 shadow-sm p-3 rounded text-center table-danger">
+        <a class="btn btn-outline-danger btn-block m-0" href="/profile#profile">Profile</a>
+        <hr>
+        <a class="btn btn-outline-danger btn-block m-0" href="/profile#settings">Account Settings</a>
+        <hr>
+        <a class="btn btn-outline-danger btn-block m-0" href="/profile#delete-account">Delete Account</a>
+
+    </div>
+    <div class="col">
+        <h1 class="display-4 text-center" id='profile'>Profile</h1>
+        <hr>
+        <p class="lead"><strong>Username:</strong> {{user.username}}</p>
+        <p class="lead"><strong>Email:</strong> {{user.email}}</p>
+        <p class="lead"><strong>Leagues:</strong></p>
+        <ul style="list-style-type:none;">
+            {% for league in user.leagues %}
+            <a class="btn btn-success btn-block" href="/leagues/{{league.id}}">
+                <li>{{league.name}} | {{league.num_teams}} Teams | Week
+                    {{league.week}}</li>
+            </a>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-12">
+        <h1 class="display-4 text-center" id='settings'>Settings</h1>
+        <a class="btn btn-light m-1 btn-block" href="/users/{{user.id}}/change-password">Change Username</a><br>
+        <a class="btn btn-light m-1 btn-block" href="/users/{{user.id}}/change-password">Change Email</a><br>
+        <a class="btn btn-light m-1 btn-block" href="/users/{{user.id}}/change-password">Change Password</a>
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-12 text-center" id='delete-account'>
+        <a class="btn btn-lg btn-outline-danger mt-2" href="/users/{{user.id}}/delete" id='delete-btn'>DELETE
+            ACCOUNT</a>
+    </div>
+</div>
 
 {% endblock %}

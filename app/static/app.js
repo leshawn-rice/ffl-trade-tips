@@ -22,7 +22,25 @@ function setAddLeagueBtnLink() {
   });
 }
 
+function addDeleteAccountAlert() {
+  /*
+  Adds an alert to user profile
+  to confirm if the user would like to
+  delete their account
+  */
+  $btn = $('#delete-btn')
+  $btn.click((event) => {
+    event.preventDefault();
+    isProceeding = confirm('Are you sure you would like to delete your account?')
+    if (isProceeding) {
+      $user_id = $('#user-id').text();
+      location = `/users/${$user_id}/delete`
+    }
+  });
+}
+
 $(() => {
   setActiveLinkInNavbar();
   setAddLeagueBtnLink();
+  addDeleteAccountAlert();
 });

@@ -6,6 +6,14 @@
 
 {% block content %}
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{category}} text-center">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
 <div class="jumbotron my-1">
     <h1 class="display-4">Welcome!</h1>
     <p class="lead">This is the current working test for my capstone 1.</p>
