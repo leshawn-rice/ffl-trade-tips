@@ -1,11 +1,12 @@
 from flask import render_template, redirect, session, request
 from app.app import app
+from app.database import db
 from espn.settings import POSITIONS, GRADE_MAP
 from espn.classes.news_class import News
 from espn.models import LeagueModel, TeamModel, PlayerModel
 from user.models import UserModel
 from user.auth import UserAuthentication
-from app.forms import AddLeagueForm
+from app.forms import AddLeagueForm, SelectTeamForm
 
 authentication = UserAuthentication()
 
@@ -47,12 +48,13 @@ def add_league():
     if form.validate_on_submit():
         league = authentication.add_league(form)
         if league:
-            return redirect('/')
+            user_id = session.get('user_id')
+            league_model = LeagueModel.query.filter_by(
+                league_id=form.league_id.data, user_id=user_id).first()
+            return redirect(f'/leagues/{league_model.id}/select-team')
         else:
-            print('COULD NOT ADD LEAGUE')
             return render_template('add_league.html', form=form)
     else:
-        print('FORM NOT VALIDATED')
         return render_template('add_league.html', form=form)
 
 
@@ -68,6 +70,28 @@ def show_leagues():
     return render_template('all_leagues.html', leagues=leagues)
 
 
+@app.route('/leagues/<int:league_id>/select-team', methods=['GET', 'POST'])
+def select_team(league_id):
+    '''Allows User to select their team from list of teams'''
+    if 'user_id' not in session:
+        return redirect('/login')
+    league = LeagueModel.query.get_or_404(league_id)
+    if league.user_id == session.get('user_id'):
+        form = SelectTeamForm()
+        choices = [(t.id, t.team_name) for t in league.teams]
+        form.team.choices = choices
+        if form.validate_on_submit():
+            user_team_id = form.team.data
+            league.user_team = user_team_id
+            db.session.commit()
+            return redirect('/')
+
+        return render_template('select_team.html', form=form)
+
+    flash('You cannot do that for league you don\'t own!', 'danger')
+    return redirect('/')
+
+
 @app.route('/leagues/<int:league_id>')
 def league_page(league_id):
     '''Displays information about the league with id league_id'''
@@ -75,7 +99,8 @@ def league_page(league_id):
         return redirect('/login')
     league = LeagueModel.query.get_or_404(league_id)
     if league.user_id == session.get('user_id'):
-        return render_template('league.html', league=league)
+        user_team = TeamModel.query.get_or_404(league.user_team)
+        return render_template('league.html', league=league, user_team=user_team)
 
     return redirect('/leagues')
 

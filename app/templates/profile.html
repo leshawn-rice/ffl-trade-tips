@@ -7,14 +7,8 @@
 <p hidden id='user-id'>{{user.id}}</p>
 
 <div class="row">
-    <div class="col-0 col-md-3 shadow-sm p-3 rounded text-center table-danger">
-        <a class="btn btn-outline-danger btn-block m-0" href="/profile#settings">Account Settings</a>
-        <hr>
-        <a class="btn btn-outline-danger btn-block m-0" href="/profile#delete-account">Delete Account</a>
-
-    </div>
-    <div class="col">
-        <h1 class="display-4 text-center" id='settings'>Profile</h1>
+    <div class="col text-center">
+        <h1 class="display-4 text-center" id='settings'>Your Profile</h1>
         <hr>
         <p class="lead"><strong>Username:</strong> {{user.username}} <a class="btn btn-sm btn-light"
                 href="/users/{{user.id}}/change-username">Change

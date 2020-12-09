@@ -19,6 +19,7 @@ class LeagueModel(db.Model):
     name = db.Column(db.Text, nullable=False)
     week = db.Column(db.Integer, nullable=False)
     num_teams = db.Column(db.Integer, nullable=False)
+    user_team = db.Column(db.Integer)
 
     players = db.relationship(
         'PlayerModel', backref='league')

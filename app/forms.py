@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, IntegerField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, IntegerField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import InputRequired, Email, Regexp, NumberRange, Optional, EqualTo
 from espn.settings import POSITIONS
 
@@ -67,3 +67,16 @@ class ContactForm(FlaskForm):
         message='Email cannot be blank!'), Email(message='Invalid Email!')])
     message = TextAreaField('Message', validators=[
         InputRequired(message='Message cannot be blank!')])
+
+
+class SelectTeamForm(FlaskForm):
+    '''
+    Form for sending an email
+    Fields:
+            email, message
+    Validation:
+                All inputs required, email must be a valid email, message cannot be blank
+    '''
+    # Add validation for username length (no more than 20 per db)
+    team = SelectField('Teams', validators=[
+                       InputRequired(message='Team cannot be empty!')])

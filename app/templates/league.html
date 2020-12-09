@@ -8,6 +8,28 @@
 
 <div class="row justify-content-between text-center">
 
+    <h1 class="display-4">Your Team</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr class="bg-primary text-light">
+                <th>Name</th>
+                <th>Record</th>
+                <th>Points</th>
+                <th>Waiver Position</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="/teams/{{user_team.id}}" class="bg-secondary rounded">{{user_team.team_name}}</a></td>
+                <td>{{user_team.record}}</td>
+                <td>{{user_team.points}}</td>
+                <td>{{user_team.waiver_position}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <br><br><br>
+
     <table class="table table-striped" id="teams-table-desktop">
         <thead>
             <tr class="bg-danger text-light">
