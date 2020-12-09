@@ -49,8 +49,10 @@ def add_league():
         if league:
             return redirect('/')
         else:
+            print('COULD NOT ADD LEAGUE')
             return render_template('add_league.html', form=form)
     else:
+        print('FORM NOT VALIDATED')
         return render_template('add_league.html', form=form)
 
 

@@ -41,11 +41,20 @@ function addDeleteAccountAlert() {
 
 function addLoadingScreen() {
   $content = $('.container-fluid')
-  $addLeagueBtn = $('#add-league-btn')
+  $addLeagueForm = $('#add-league-form')
+  $addLeagueForm.submit(() => {
+    $loadingRow = $('<div class="row">')
+    $loadingCol = $('<div class="col-12 text-center">')
+    $loadingDiv = $('<i class="fas fa-spinner fa-pulse fa-3x">')
+    $loadingCol.append($loadingDiv)
+    $loadingRow.append($loadingCol)
+    $content.append($loadingRow)
+  });
 }
 
 $(() => {
   setActiveLinkInNavbar();
   setAddLeagueBtnLink();
   addDeleteAccountAlert();
+  addLoadingScreen();
 });
