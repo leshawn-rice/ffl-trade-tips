@@ -130,6 +130,11 @@ class GradeCalculator:
             session[f'{player.position}_min'] = score
 
     def get_ppr(self):
+        '''
+        Gets whether or not the league
+        is PPR from the session, and changes the
+        scoring stat for receptions based on it
+        '''
         self.ppr = session.get('PPR')
         if self.ppr:
             self.ppr = 1
