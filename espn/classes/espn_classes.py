@@ -7,6 +7,8 @@ from espn.settings import PRO_TEAM_MAP, STATS_MAP, POSITION_MAP, STANDARD_SEASON
 
 
 class League(ESPNBase):
+    '''ESPN API Wrapper for Leagues'''
+
     def __init__(self, league_id, year, user_id, cookies=None):
         self.id = league_id
         self.year = year
@@ -60,6 +62,8 @@ class League(ESPNBase):
 
 
 class Team(ESPNBase):
+    '''ESPN API Wrapper for Teams'''
+
     def __init__(self, data, league_info):
         self.league_info = league_info
         self.roster = set()
@@ -110,6 +114,8 @@ class Team(ESPNBase):
 
 
 class Player(ESPNBase):
+    '''ESPN API Wrapper for Players'''
+
     def __init__(self, data, league_info, team_id):
         self.league_info = league_info
         self.team_id = team_id

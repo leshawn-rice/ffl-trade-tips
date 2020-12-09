@@ -14,7 +14,6 @@ class CreateUserForm(FlaskForm):
                 letters and one or more numbers
 
     '''
-    # Add validation for username length (no more than 20 per db)
     email = StringField('Email', validators=[InputRequired(
         message='Email cannot be blank!'), Email(message='Invalid Email!')])
     username = StringField('Username', validators=[
@@ -41,6 +40,13 @@ class LoginForm(FlaskForm):
 
 
 class AddLeagueForm(FlaskForm):
+    '''
+    Form for adding a league
+    Fields:
+            league_id, year, is_ppr
+    Validation:
+                All inputs required except is_ppr, league_id must be a valid integer, year must be a valid year
+    '''
     league_id = IntegerField('League ID', validators=[
                              InputRequired(message='You must enter a League ID!')])
     year = IntegerField('Year', validators=[InputRequired(
@@ -50,13 +56,11 @@ class AddLeagueForm(FlaskForm):
 
 class ContactForm(FlaskForm):
     '''
-    Form for creating a new user
+    Form for sending an email
     Fields:
-            email, username, password
+            email, message
     Validation:
-                All inputs required, password must be 8+ characters with one or more upper/lower case 
-                letters and one or more numbers
-
+                All inputs required, email must be a valid email, message cannot be blank
     '''
     # Add validation for username length (no more than 20 per db)
     email = StringField('Email', validators=[InputRequired(
