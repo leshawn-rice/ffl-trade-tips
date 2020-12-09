@@ -7,9 +7,14 @@
 
 <div class="row">
     <div class="col-12 col-md-2 d-flex justify-content-center">
+        {% if player.position == 'D/ST' %}
+        <img class="img-fluid shadow mb-5 rounded" src="/static/img/dst.png" alt=" {{player.full_name}} logo" width=200
+            height=200>
+        {% else %}
         <img class="img-fluid shadow mb-5 rounded"
             src="https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/{{player.player_id}}.png&w=426&h=310&cb=1"
             alt="{{player.full_name}} logo" width=200 height=200>
+        {% endif %}
     </div>
     <div class="col-10">
         <a class="btn btn-warning mt-2" href="/teams/{{player.team.id}}">Back to {{player.team.team_name}}</a>
