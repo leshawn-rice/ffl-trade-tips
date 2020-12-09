@@ -8,38 +8,29 @@
 
 <div class="row">
     <div class="col-0 col-md-3 shadow-sm p-3 rounded text-center table-danger">
-        <a class="btn btn-outline-danger btn-block m-0" href="/profile#profile">Profile</a>
-        <hr>
         <a class="btn btn-outline-danger btn-block m-0" href="/profile#settings">Account Settings</a>
         <hr>
         <a class="btn btn-outline-danger btn-block m-0" href="/profile#delete-account">Delete Account</a>
 
     </div>
     <div class="col">
-        <h1 class="display-4 text-center" id='profile'>Profile</h1>
+        <h1 class="display-4 text-center" id='settings'>Profile</h1>
         <hr>
-        <p class="lead"><strong>Username:</strong> {{user.username}}</p>
-        <p class="lead"><strong>Email:</strong> {{user.email}}</p>
+        <p class="lead"><strong>Username:</strong> {{user.username}} <a class="btn btn-sm btn-light"
+                href="/users/{{user.id}}/change-username">Change
+                Username</a></p>
+        <p class="lead"><strong>Email:</strong> {{user.email}} <a class="btn btn-sm btn-light"
+                href="/users/{{user.id}}/change-email">Change Email</a></p>
+        <p class="lead"><strong>Password:</strong> ********** <a class="btn btn-sm btn-light"
+                href="/users/{{user.id}}/change-password">Change Password</a></p>
         <p class="lead"><strong>Leagues:</strong></p>
-        <ul style="list-style-type:none;">
+        <ul class="text-center" style="list-style-type:none;">
             {% for league in user.leagues %}
-            <a class="btn btn-success btn-block" href="/leagues/{{league.id}}">
-                <li>{{league.name}} | {{league.num_teams}} Teams | Week
-                    {{league.week}}</li>
-            </a>
+            <li class="my-2"><a class="btn btn-success" href="/leagues/{{league.id}}">{{league.name}} |
+                    {{league.num_teams}} Teams |
+                    Week {{league.week}}</a></li>
             {% endfor %}
         </ul>
-    </div>
-</div>
-
-<hr>
-
-<div class="row">
-    <div class="col-12">
-        <h1 class="display-4 text-center" id='settings'>Settings</h1>
-        <a class="btn btn-light m-1 btn-block" href="/users/{{user.id}}/change-username">Change Username</a><br>
-        <a class="btn btn-light m-1 btn-block" href="/users/{{user.id}}/change-email">Change Email</a><br>
-        <a class="btn btn-light m-1 btn-block" href="/users/{{user.id}}/change-password">Change Password</a>
     </div>
 </div>
 

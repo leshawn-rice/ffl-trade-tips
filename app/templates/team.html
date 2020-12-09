@@ -45,7 +45,7 @@
             <thead class="bg-danger text-light">
                 <tr>
                     <th>Stat Name</th>
-                    <th>Stat Value</th>
+                    <th>Points From Stat</th>
                 </tr>
             </thead>
             <tbody>
@@ -53,7 +53,7 @@
                 {% if stat.stat_value != 0 %}
                 <tr>
                     <td>{{stat.stat_name}}</td>
-                    <td>{{stat.stat_value}}</td>
+                    <td>{{stat.stat_value}}pts</td>
                 </tr>
                 {% endif %}
                 {% endfor %}
