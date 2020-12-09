@@ -128,11 +128,15 @@ class UserAuthentication:
         user = UserModel.query.filter(
             username.upper() == username.upper()).first()
 
-        has_correct_password = self.compare_passwords(user.password, password)
-
-        if has_correct_password:
-            session['user_id'] = user.id
-            return True
+        if user:
+            has_correct_password = self.compare_passwords(
+                user.password, password)
+            if has_correct_password:
+                session['user_id'] = user.id
+                return True
+            else:
+                flash('Username/Password do not match!')
+                return False
         else:
             flash('Username/Password do not match!')
             return False

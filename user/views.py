@@ -1,5 +1,6 @@
-from flask import redirect, render_template, session
+from flask import redirect, render_template, session, flash
 from app.app import app
+from app.database import db
 from app.forms import LoginForm, CreateUserForm, AddLeagueForm
 from user.auth import UserAuthentication
 from user.models import UserModel
@@ -9,6 +10,10 @@ authentication = UserAuthentication()
 
 @app.route('/profile')
 def profile_page():
+    '''
+    Renders the users profile page
+    if they're logged in
+    '''
     if 'user_id' not in session:
         return redirect('/')
     user_id = session.get('user_id')
@@ -56,10 +61,12 @@ def signup():
     '''
     if 'user_id' in session:
         return redirect('/')
-
+    # If we alert the user their username is taken, remove it from
+    # the session to prevent subsequent alerts
     if session.get('username_taken'):
         session.pop('username_taken')
-
+    # If we alert the user their email is taken, remove it from
+    # the session to prevent subsequent alerts
     if session.get('email_taken'):
         session.pop('email_taken')
 
@@ -73,3 +80,23 @@ def signup():
             return render_template('signup.html', form=form)
     else:
         return render_template('signup.html', form=form)
+
+
+@app.route('/users/<int:user_id>/delete')
+def delete_user(user_id):
+    '''
+    Deletes the user with id user_id from
+    the database, if authentication succeeds.
+    Otherwise returns home
+    '''
+    if 'user_id' not in session:
+        flash('You need to be logged in to do that!', 'danger')
+    elif user_id == session.get('user_id'):
+        user = UserModel.query.get_or_404(user_id)
+        db.session.delete(user)
+        db.session.commit()
+        flash('Account Deleted Successfuly', 'success')
+        return redirect('/sign-out')
+    else:
+        flash('You cannot delete an account that isn\'t yours!', 'danger')
+    return redirect('/')
