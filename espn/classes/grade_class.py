@@ -47,10 +47,6 @@ class GradeCalculator:
         stats = player.stats
         total = 0
 
-        # for stat in self.stat_scores.keys():
-        #     total = self.adjust_score_total(player_stats=stats,
-        #                                     current_stat=stat, current_total=total)
-
         total += player.points * self.weight
 
         if total != 0:

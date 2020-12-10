@@ -138,8 +138,11 @@ class PlayerModelHandler(ModelHandlerBase):
             if stat.stat_name in self.instance.stats.keys():
                 stat.stat_value = self.instance.stats[stat.stat_name]
 
+        db.session.commit()
+        print(stat_names)
         for stat, val in self.instance.stats.items():
             if stat not in stat_names:
+                print(stat)
                 new_stat = PlayerStatModel(
                     player_id=player_id, league_id=self.instance.league_id, stat_name=stat, stat_value=val)
                 db.session.add(new_stat)

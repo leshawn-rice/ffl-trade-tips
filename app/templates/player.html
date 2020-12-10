@@ -9,8 +9,8 @@
 <div class="row">
     <div class="col-12 col-md-4">
         {% if player.position == 'D/ST' %}
-        <img class="img-fluid shadow mb-5 rounded" src="/static/img/dst.png" alt=" {{player.full_name}} logo" width=500
-            height=500>
+        <img class="img-fluid shadow mb-0 mr-0 rounded" src="/static/img/dst.png" alt=" {{player.full_name}} logo"
+            width=500 height=500>
         {% else %}
         <img class="img-fluid shadow mb-0 mr-0 rounded"
             src="https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/{{player.player_id}}.png&w=426&h=310&cb=1"
@@ -29,6 +29,7 @@
         <p>Position Rank: {{player.position_rank}}</p>
         <p>Total Points: {{player.points}}</p>
         <p>Grade: {{player.grade}}</p>
+        <a class="btn btn-warning btn-sm mt-2" href="/teams/{{player.team.id}}">Back to {{player.team.team_name}}</a>
     </div>
     <div class="col-12 col-md-5">
         <h2 class="display-4 text-center">Trade Suggestions</h2>
@@ -75,7 +76,7 @@
 
 
 <div class="row">
-    <div class="col-12 col-md-4 border w-100" id="player_hidden_div">
+    <div class="col-12 col-md-4 border w-100 mt-2" id="player_hidden_div">
         <div class="d-flex justify-content-between border-bottom">
             <p class="lead">Stat Name</p>
             <p class="lead">Points From Stat</p>

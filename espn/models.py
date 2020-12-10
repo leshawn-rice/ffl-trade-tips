@@ -71,6 +71,7 @@ class TeamModel(db.Model):
     record = db.Column(db.Text)
     waiver_position = db.Column(db.Integer)
     points = db.Column(db.Float)
+    grade = db.Column(db.Text)
 
     players = db.relationship(
         'PlayerModel', backref='team', cascade='all, delete')

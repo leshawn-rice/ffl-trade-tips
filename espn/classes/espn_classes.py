@@ -92,12 +92,38 @@ class League(ESPNBase):
                 grader.get_pos_extremes(record)
 
     def get_grades(self, grader):
+        gpa = {
+            'A': 4,
+            'B': 3,
+            'C': 2,
+            'D': 1,
+            'F': 0
+        }
+        gpa_letter = {
+            4: 'A',
+            3: 'B',
+            2: 'C',
+            1: 'D',
+            0: 'F'
+        }
         for team in self.teams:
+            team_score = 0
             for player in team.roster:
                 record = PlayerModel.query.filter_by(
                     player_id=player.id, league_id=player.league_id).first()
                 record.grade = grader.grade_player(record)
                 db.session.commit()
+                team_score += gpa[record.grade]
+
+            team_grade = team_score / len(team.roster)
+            team_grade = gpa_letter[round(team_grade)]
+
+            record = TeamModel.query.filter_by(
+                team_id=team.id, league_id=team.league_id, user_id=self.user_id).first()
+            record.grade = team_grade
+            db.session.commit()
+
+            print(f'TEAM GRADE: {team_grade}')
 
     def grade_teams(self):
         grader = GradeCalculator(self.settings.scoring_settings)
