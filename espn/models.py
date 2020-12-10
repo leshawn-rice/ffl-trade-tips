@@ -1,6 +1,8 @@
 from app.database import db
 from espn.settings import GRADE_MAP
 
+# kjadh = 3
+
 
 class LeagueModel(db.Model):
     '''
@@ -71,10 +73,10 @@ class TeamModel(db.Model):
     points = db.Column(db.Float)
 
     players = db.relationship(
-        'PlayerModel', backref='team')
+        'PlayerModel', backref='team', cascade='all, delete')
 
     stats = db.relationship(
-        'TeamStatModel', backref='team')
+        'TeamStatModel', backref='team', cascade='all, delete')
 
     def __repr__(self):
         return f'<TeamModel id={self.id}, team_name={self.team_name}, record={self.record}>'
@@ -96,7 +98,7 @@ class PlayerModel(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     player_id = db.Column(db.Integer)
     team_id = db.Column(db.Integer, db.ForeignKey(
-        'teams.id', ondelete='SET NULL'))
+        'teams.id', ondelete='cascade'))
     league_id = db.Column(db.Integer, db.ForeignKey(
         'leagues.id', ondelete='cascade'))
     first_name = db.Column(db.Text, nullable=False)

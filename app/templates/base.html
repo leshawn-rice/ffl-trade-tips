@@ -1,7 +1,7 @@
 {% extends 'html_base.html' %}
 
 {% block navbar %}
-<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-danger justify-content-start p-0">
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-start p-0">
     <p class="navbar-brand d-flex align-self-center font-weight-bold m-0 p-0">Fantasy Football Trade Tips</p>
     {% if 'user_id' in session %}
     <a class="nav-link ml-auto text-light" id="profile-phone" href="/profile"><i class="fas fa-user"
@@ -46,13 +46,13 @@
 {% endblock %}
 {% block footer %}
 <br><br><br><br>
-<footer class="footer bg-danger">
+<footer class="footer bg-dark">
     <div class="row">
         <div class="col-4">
-            <p class="h6 ml-3">Leshawn Rice 2020</p>
+            <p class="h6 ml-3 text-light">Leshawn Rice 2020</p>
         </div>
         <div class="col-8 footer-links">
-            <a href="https://github.com/leshawn-rice" target="_blank" class="text-dark" data-toggle="tooltip"
+            <a href="https://github.com/leshawn-rice" target="_blank" class="text-light" data-toggle="tooltip"
                 data-placement="top" title="Github"><i class="fab fa-github"></i></a>
             <a href="https://linkedin.com/in/leshawn-rice" target="_blank" class="text-primary" data-toggle="tooltip"
                 data-placement="top" title="LinkedIn"><i class="fab fa-linkedin"></i></a>

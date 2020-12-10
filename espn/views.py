@@ -1,4 +1,4 @@
-from flask import render_template, redirect, session, request
+from flask import render_template, redirect, session, request, jsonify
 from app.app import app
 from app.database import db
 from espn.settings import POSITIONS, GRADE_MAP
@@ -16,14 +16,20 @@ def get_trade_suggestions(player):
     Gets players with grades 1 below and above the current
     player's with the same position, and returns a list of them.
     '''
+    user_id = session.get('user_id')
     player_grade = request.form.get('player_grade')
+    trade_suggestions = []
     if player_grade:
         acceptable_grades = GRADE_MAP[player_grade]
-        trade_suggestions = PlayerModel.query.filter(
-            PlayerModel.grade.in_(acceptable_grades), PlayerModel.position == player.position, PlayerModel.id != player.id).all()
-        return trade_suggestions
+        teams = TeamModel.query.filter_by(user_id=user_id)
+        for team in teams:
+            for p in team.players:
+                if p.grade in (acceptable_grades) and p.position == player.position and p.id != player.id and p.points >= player.points:
+                    trade_suggestions.append(p)
+    if trade_suggestions:
+        return trade_suggestions[:3]
     else:
-        return []
+        return ['NO PLAYERS FOUND']
 
 
 @app.route('/recent-news')
@@ -124,12 +130,24 @@ def player_page(player_id):
     if 'user_id' not in session:
         return redirect('/login')
     player = PlayerModel.query.get_or_404(player_id)
-    print(player)
-    print(player.league)
     league = player.league
     if league.user_id == session.get('user_id'):
-        trade_suggestions = get_trade_suggestions(player)
-        if trade_suggestions:
+        if request.method == 'POST':
+            trade_suggestions = get_trade_suggestions(player)
             return render_template('player.html', player=player, trade_suggestions=trade_suggestions)
-        return render_template('player.html', player=player)
+        else:
+            return render_template('player.html', player=player)
     return redirect(f'/teams/{player.team.id}')
+
+
+@app.route('/players/<int:player_id>/stats-data')
+def get_player_stats(player_id):
+    player = PlayerModel.query.get_or_404(player_id)
+    print(player.stats)
+    stats = []
+    for stat in player.stats:
+        stat_dict = {}
+        stat_dict['name'] = stat.stat_name
+        stat_dict['value'] = stat.stat_value
+        stats.append(stat_dict)
+    return (jsonify(stats=stats), 200)

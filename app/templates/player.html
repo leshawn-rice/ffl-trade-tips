@@ -4,88 +4,116 @@
 
 
 {% block content %}
+<meta id="js-player-id" data-player-id="{{player.id}}">
 
 <div class="row">
-    <div class="col-12 col-md-2 d-flex justify-content-center">
+    <div class="col-12 col-md-4">
         {% if player.position == 'D/ST' %}
-        <img class="img-fluid shadow mb-5 rounded" src="/static/img/dst.png" alt=" {{player.full_name}} logo" width=200
-            height=200>
+        <img class="img-fluid shadow mb-5 rounded" src="/static/img/dst.png" alt=" {{player.full_name}} logo" width=500
+            height=500>
         {% else %}
-        <img class="img-fluid shadow mb-5 rounded"
+        <img class="img-fluid shadow mb-0 mr-0 rounded"
             src="https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/{{player.player_id}}.png&w=426&h=310&cb=1"
-            alt="{{player.full_name}} logo" width=200 height=200>
+            alt="{{player.full_name}} logo" width=500 height=500>
         {% endif %}
-    </div>
-    <div class="col-10">
-        <a class="btn btn-warning mt-2" href="/teams/{{player.team.id}}">Back to {{player.team.team_name}}</a>
-        <h1 class="display-1 text-center">{{player.full_name}}</h1>
-    </div>
-</div>
-<div class="row">
-    <div class="col-12 col-md-6">
-        <h2 class="display-4 text-center">Stats</h2>
-        <table class="table table-striped">
-            <thead class="bg-danger text-light">
-                <tr>
-                    <th>Stat Name</th>
-                    <th>Points From Stat</th>
-                </tr>
-            </thead>
-            <hr>
-            <tbody>
-                <tr>
-                    <td>Overall Grade
-                        {% if player.grade == 'F' or player.grade == 'D' %}
-                        <span class="badge badge-danger">Trade Suggested!</span>
-                        {% elif player.grade == 'A' %}
-                        <span class="badge badge-success">Player Okay!</span>
-                        {% endif %}
-                    </td>
-                    <td>{{player.grade}}</td>
-                </tr>
-                {% for stat in player.stats %}
-                {% if stat.stat_value != 0 %}
-                <tr>
-                    <td>{{stat.stat_name}}</td>
-                    <td>{{stat.stat_value}}pts</td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="col-12 col-md-6">
-        <h2 class="display-4 text-center">Trade Suggestions</h2>
         <div class="text-center">
+            <button class="btn btn-sm btn-warning player-button" id="player_stats_btn">Stats</button>
+            <a class="btn btn-sm btn-warning player-button" href="/teams/{{player.team.id}}">Schedule</a>
+            <a class="btn btn-sm btn-warning player-button" href="/teams/{{player.team.id}}">Outlooks</a>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <p>Name: {{player.full_name}}</p>
+        <p>Fantasy Team: {{player.team.team_name}}</p>
+        <p>Position: {{player.position}}</p>
+        <p>Position Rank: {{player.position_rank}}</p>
+        <p>Total Points: {{player.points}}</p>
+        <p>Grade: {{player.grade}}</p>
+    </div>
+    <div class="col-12 col-md-5">
+        <h2 class="display-4 text-center">Trade Suggestions</h2>
+        <div class="border border-success px-2">
             {% if trade_suggestions %}
-            <table class="table table-striped">
-                <thead class="bg-danger text-light">
+            <div class="d-flex justify-content-between border-bottom">
+                <p class="lead">Name</p>
+                <p class="lead">Grade</p>
+            </div>
+            {% if trade_suggestions[0] != 'NO PLAYERS FOUND' %}
+            <div class="d-flex justify-content-between">
+                <p class="lead">{{player.full_name}}<span class="badge badge-success"> Current</span></p>
+                <p class="lead">{{player.grade}}</p>
+            </div>
+            {% for trade_player in trade_suggestions %}
+            <div class="d-flex justify-content-between">
+                <p class="lead"><a class="text-light" href="/players/{{trade_player.id}}">{{trade_player.full_name}}</a>
+                </p>
+                <p class="lead">{{trade_player.grade}}</span>
+            </div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-between">
+                <a href="#" class="btn btn-sm btn-outline-light">Save Trade to Profile</a>
+                <a class="btn btn-sm btn-outline-light" href="/contact">Give Feedback!</a>
+            </div>
+
+            {% else %}
+            <div class="d-flex justify-content-center">
+                <p class="lead mt-2">No Trade Suggestions Found!</p>
+            </div>
+            {% endif %}
+
+            {% endif %}
+        </div>
+        <form action="" method="POST" class="text-center">
+            <input type="text" name="player_grade" value="{{player.grade}}" hidden>
+            <button class="btn btn-success text-center mt-1">Get Trade Suggestions</button>
+        </form>
+
+    </div>
+
+</div>
+
+
+<div class="row">
+    <div class="col-12 col-md-4 border w-100" id="player_hidden_div">
+        <div class="d-flex justify-content-between border-bottom">
+            <p class="lead">Stat Name</p>
+            <p class="lead">Points From Stat</p>
+        </div>
+        <div id="player_stats_div">
+        </div>
+
+    </div>
+    <div class="col-12 col-md-8">
+        <div class="ml-2 text-center">
+            <h2 class="display-4">Trade Simulator</h2>
+            <table class="table table-striped table-secondary">
+                <thead>
                     <tr>
-                        <th>Player Name</th>
-                        <th>Player Grade</th>
+                        <th>Your Team</th>
+                        {% if form %}
+                        {{form.hidden_tag()}}
+                        {% for field in form 
+                            if field.widget.input_type != 'hidden' %}
+
+                        <th>{{field.label}}
+                            {{field(class_="form-control")}}</th>
+                        {% endfor %}
+                        {% else %}
+                        <th>Other Team</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>{{player.full_name}}<span class="badge badge-success"> Current</span></td>
-                        <td>{{player.grade}}</td>
+                        <td>Team1</td>
+                        <td>Team2</td>
                     </tr>
-                    {% for trade_player in trade_suggestions %}
-                    <tr>
-                        <td><a class="bg-secondary rounded"
-                                href="/players/{{trade_player.id}}">{{trade_player.full_name}}</a></td>
-                        <td>{{trade_player.grade}}</td>
-                    </tr>
-                    {% endfor %}
                 </tbody>
             </table>
-            {% endif %}
-            <form action="" method="POST">
-                <input type="text" name="player_grade" value="{{player.grade}}" hidden>
-                <button class="btn btn-success text-center">Get Trade Suggestions</button>
-            </form>
         </div>
     </div>
+
 </div>
 
 {% endblock %}

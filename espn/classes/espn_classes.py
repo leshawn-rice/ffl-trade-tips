@@ -3,7 +3,30 @@ from espn.classes.base_classes import ESPNBase
 from espn.classes.grade_class import GradeCalculator
 from espn.classes.model_handler_classes import LeagueModelHandler, TeamModelHandler, PlayerModelHandler
 from espn.models import LeagueModel, TeamModel, TeamStatModel, PlayerModel, PlayerStatModel
-from espn.settings import PRO_TEAM_MAP, STATS_MAP, POSITION_MAP, STANDARD_SEASON_LENGTH
+from espn.settings import PRO_TEAM_MAP, STATS_MAP, POSITION_MAP, STANDARD_SEASON_LENGTH, DEFAULT_STAT_VALUES
+
+
+class Settings:
+    def __init__(self, data):
+        self.scoring_settings = {}
+        self.current_week = data['scoringPeriodId']
+        self.get_league_settings(data)
+        self.get_scoring_settings(data)
+
+    def get_league_settings(self, data):
+        self.is_active = data['status']['isActive']
+        self.total_weeks = data['status']['finalScoringPeriod']
+
+    def get_scoring_settings(self, data):
+        scoring_settings = data['settings']['scoringSettings']
+        scoring_items = scoring_settings['scoringItems']
+        for stat in scoring_items:
+            if stat['statId'] in STATS_MAP:
+                stat_name = STATS_MAP[stat['statId']]
+                if '16' in stat['pointsOverrides']:
+                    self.scoring_settings[stat_name] = stat['pointsOverrides']['16']
+                else:
+                    self.scoring_settings[stat_name] = DEFAULT_STAT_VALUES[stat_name]
 
 
 class League(ESPNBase):
@@ -17,6 +40,13 @@ class League(ESPNBase):
         self.league_info = {'league_model_id': None, 'league_id': self.id,
                             'year': self.year, 'cookies': self.cookies, 'user_id': self.user_id}
         self.create_league()
+
+    def get_settings(self):
+        params = {'view': 'mSettings'}
+        data = self.make_espn_request(params)
+        self.settings = Settings(data)
+        self.league_info['current_week'] = self.settings.current_week
+        self.league_info['total_weeks'] = self.settings.total_weeks
 
     def get_basic_info(self):
         self.teams = set()
@@ -54,11 +84,34 @@ class League(ESPNBase):
         db_handler = LeagueModelHandler(self)
         db_handler.add_or_update_record()
 
+    def get_scoring_ranges(self, grader):
+        for team in self.teams:
+            for player in team.roster:
+                record = PlayerModel.query.filter_by(
+                    player_id=player.id, league_id=player.league_id).first()
+                grader.get_pos_extremes(record)
+
+    def get_grades(self, grader):
+        for team in self.teams:
+            for player in team.roster:
+                record = PlayerModel.query.filter_by(
+                    player_id=player.id, league_id=player.league_id).first()
+                record.grade = grader.grade_player(record)
+                db.session.commit()
+
+    def grade_teams(self):
+        grader = GradeCalculator(self.settings.scoring_settings)
+        self.get_scoring_ranges(grader)
+        grader.set_grade_ranges()
+        self.get_grades(grader)
+
     def create_league(self):
         self.get_basic_info()
+        self.get_settings()
         self.get_num_teams()
         self.handle_db()
         self.get_teams()
+        self.grade_teams()
 
 
 class Team(ESPNBase):
@@ -156,7 +209,8 @@ class Player(ESPNBase):
         self.points = stat_block['appliedTotal']
         self.points = round(self.points, 2)
         self.point_avg = stat_block['appliedAverage']
-        self.projected_points = self.point_avg * STANDARD_SEASON_LENGTH
+        self.projected_points = self.point_avg * \
+            self.league_info['total_weeks']
         self.projected_points = round(self.projected_points, 2)
 
         stats_to_check = stat_block['appliedStats'] if stat_block.get(
@@ -168,13 +222,6 @@ class Player(ESPNBase):
         stat_data = self.get_stat_data(data)
         self.add_stats(stat_data)
 
-    def get_grade(self):
-        grader = GradeCalculator()
-        record = PlayerModel.query.filter_by(
-            player_id=self.id, league_id=self.league_id).first()
-        record.grade = grader.grade_player(record)
-        db.session.commit()
-
     def handle_db(self):
         db_handler = PlayerModelHandler(self)
         db_handler.add_or_update_record()
@@ -183,4 +230,3 @@ class Player(ESPNBase):
         self.get_basic_info(data)
         self.get_stats(data)
         self.handle_db()
-        self.get_grade()

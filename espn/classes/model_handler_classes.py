@@ -1,9 +1,6 @@
 from app.database import db, add_to_db
 from espn.classes.base_classes import ModelHandlerBase
-from espn.classes.grade_class import GradeCalculator
 from espn.models import LeagueModel, TeamModel, TeamStatModel, PlayerModel, PlayerStatModel
-
-grade_calc = GradeCalculator()
 
 
 class LeagueModelHandler(ModelHandlerBase):
@@ -157,7 +154,6 @@ class PlayerModelHandler(ModelHandlerBase):
         player.position_rank = self.instance.rank
         player.points = self.instance.points
         player.projected_points = self.instance.projected_points
-        player.grade = grade_calc.grade_player(player)
         db.session.commit()
 
     def update_record(self):

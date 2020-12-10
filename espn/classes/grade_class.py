@@ -10,82 +10,15 @@ class GradeCalculator:
     on their stats and their position
     '''
 
-    def __init__(self):
+    def __init__(self, stat_scores):
         self.positions = POSITIONS
         self.cap = 1
         self.weight = 0.05
-        self.ppr = None
+        self.stat_scores = stat_scores
+        self.extremes = {}
 
-        # Set to automatically create this before grading players
-        self.grade_ranges = {
-            'QB': {
-                'A': (28.8, 36),
-                'B': (21.6, 28.8),
-                'C': (14.4, 21.6),
-                'D': (7.2, 14.4),
-                'F': (-2, 7.2)
-            },
-            'RB': {
-                'A': (22.4, 28),
-                'B': (16.8, 22.4),
-                'C': (11.2, 16.8),
-                'D': (5.6, 11.2),
-                'F': (-2, 5.6)
-            },
-            'WR': {
-                'A': (22.4, 28),
-                'B': (16.8, 22.4),
-                'C': (11.2, 16.8),
-                'D': (5.6, 11.2),
-                'F': (-2, 5.6)
-            },
-            'TE': {
-                'A': (8.72, 11.4),
-                'B': (6.04, 8.72),
-                'C': (3.36, 6.04),
-                'D': (0.68, 3.36),
-                'F': (-2, 0.68)
-            },
-            'K': {
-                'A': (1.68, 2.1),
-                'B': (1.26, 1.68),
-                'C': (0.84, 1.26),
-                'D': (0.42, 0.84),
-                'F': (-2, 0.42)
-            },
-            'D/ST': {
-                'A': (11.76, 14.7),
-                'B': (8.82, 11.76),
-                'C': (5.88, 8.82),
-                'D': (2.94, 5.88),
-                'F': (-2, 2.94)
-            },
-            'OTHER': {
-                'A': (17.40, 21.76),
-                'B': (13.056, 17.408),
-                'C': (8.704, 13.056),
-                'D': (4.352, 8.704),
-                'F': (-2, 4.352)
-            }
-        }
-
-        self.stat_scores = {
-            # Offensive stats
-            'Passing 2 PT Conversions': 2, 'Passing Yards': 0.04, 'Passing Interceptions': -2, 'Passing Touchdowns': 4,
-            'Rushing Yards': 0.1, 'Rushing Touchdowns': 6, 'Rushing 2 PT Conversions': 2, 'Lost Fumbles': -2,
-            'Receiving Receptions': 1, 'Receiving Yards': 0.1, 'Receiving Touchdowns': 6, 'Receiving 2 PT Conversions': 2,
-            # Kicking stats
-            'Made FGs Under 40 Yards': 3, 'Made FGs From 40-49 Yards': 4, 'Made FGs From over 50 Yds': 5,
-            'Made PATs': 1, 'Missed FGs': -1.5, 'Missed PATs': 0,
-            # Defensive stats
-            'Defensive Blocked PATs': 2, 'Defensive Interceptions': 2, 'Defensive Fumbles': 2,
-            'Defensive Blocked Kicks': 2, 'Defensive Safeties': 2, 'Defensive Sacks': 1,
-            'Allowed 0 Points': 5, 'Allowed 1-6 Points': 4, 'Allowed 7-13 Points': 3,
-            'Allowed 14-17 Points': 1, 'Allowed 28-34 Points': -1, 'Allowed 35-45 Points': -3,
-            'Allowed 100-199 Yards': 3, 'Allowed 200-299 Yards': 2, 'Allowed 300-349 Yards': 0,
-            'Allowed 350-399 Yards': -1, 'Allowed 400-449 Yards': -3, 'Allowed 450-499 Yards': -5,
-            'Allowed 500-549 Yards': -6, 'Allowed Over 500 Yards': -7
-        }
+        for position in self.positions:
+            self.extremes[position] = {'MIN': 100, 'MAX': -100}
 
     def get_grade(self, score, pos):
         '''
@@ -110,54 +43,69 @@ class GradeCalculator:
             current_total += (player_stat[0].stat_value * stat_weight)
         return current_total
 
-    def get_pos_extremes(self, player, score):
+    def get_score(self, player):
+        stats = player.stats
+        total = 0
+
+        # for stat in self.stat_scores.keys():
+        #     total = self.adjust_score_total(player_stats=stats,
+        #                                     current_stat=stat, current_total=total)
+
+        total += player.points * self.weight
+
+        if total != 0:
+            score = (total / self.cap)
+        else:
+            score = 0
+
+        return score
+
+    def set_grade_ranges(self):
+        self.grade_ranges = {}
+
+        for position in self.extremes.keys():
+            increment = self.extremes[position]['MAX'] / 5
+            f_range = (0, increment)
+            d_range = (increment, increment * 2)
+            c_range = (increment * 2, increment * 3)
+            b_range = (increment * 3, increment * 4)
+            a_range = (increment * 4, increment * 5)
+            self.grade_ranges[position] = {
+                'A': a_range,
+                'B': b_range,
+                'C': c_range,
+                'D': d_range,
+                'F': f_range
+            }
+
+    def get_pos_extremes(self, player):
         '''
         Gets max and min for the given player's
         position, and puts it in the session.
         This is used to get the grade ranges for players.
         '''
-        pos_max = session.get(f'{player.position}_max')
+        score = self.get_score(player)
+
+        pos_max = self.extremes[player.position]['MAX']
         if pos_max:
             if score > pos_max:
-                session[f'{player.position}_max'] = score
+                self.extremes[player.position]['MAX'] = score
         else:
-            session[f'{player.position}_max'] = score
-        pos_min = session.get(f'{player.position}_min')
+            self.extremes[player.position]['MAX'] = score
+
+        pos_min = self.extremes[player.position]['MIN']
         if pos_min:
             if score < pos_min:
-                session[f'{player.position}_min'] = score
+                self.extremes[player.position]['MIN'] = score
         else:
-            session[f'{player.position}_min'] = score
-
-    def get_ppr(self):
-        '''
-        Gets whether or not the league
-        is PPR from the session, and changes the
-        scoring stat for receptions based on it
-        '''
-        self.ppr = session.get('PPR')
-        if self.ppr:
-            self.ppr = 1
-        else:
-            self.ppr = 0.5
-        self.stat_scores['Receiving Receptions'] = self.ppr
+            self.extremes[player.position]['MIN'] = score
 
     def grade_player(self, player):
         '''
         Takes a player, and assigns them
         a letter grade based on their stats
         '''
-        self.get_ppr()
-        stats = player.stats
-        total = 0
-
-        for stat in self.stat_scores.keys():
-            total = self.adjust_score_total(player_stats=stats,
-                                            current_stat=stat, current_total=total)
-        if total != 0:
-            score = (total / self.cap)
-        else:
-            score = 0
+        score = self.get_score(player)
 
         grade = self.get_grade(score, player.position)
         return grade

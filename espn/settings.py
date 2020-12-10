@@ -8,11 +8,11 @@ POSITION_MAP = {
 }
 
 GRADE_MAP = {
-    'A': ('A', 'B'),
-    'B': ('A', 'B', 'C'),
-    'C': ('B', 'C', 'D'),
-    'D': ('C', 'D' 'F'),
-    'F': ('D', 'F')
+    'A': ('A'),
+    'B': ('A', 'B'),
+    'C': ('B', 'C'),
+    'D': ('C', 'D'),
+    'F': ('D')
 }
 
 POSITIONS = list(set([pos for pos in POSITION_MAP.values()]))
@@ -49,4 +49,22 @@ STATS_MAP = {
     135: 'Allowed 500-549 Yards', 136: 'Allowed Over 500 Yards',
     # Extra stats
     155: 'TeamWin', 171: '20-24pointLossMargin', 172: '25+pointLossMargin',
+}
+
+DEFAULT_STAT_VALUES = {
+    # Offensive stats
+    'Passing 2 PT Conversions': 2, 'Passing Yards': 0.04, 'Passing Interceptions': -2, 'Passing Touchdowns': 4,
+    'Rushing Yards': 0.1, 'Rushing Touchdowns': 6, 'Rushing 2 PT Conversions': 2, 'Lost Fumbles': -2,
+    'Receiving Receptions': 0.5, 'Receiving Yards': 0.1, 'Receiving Touchdowns': 6, 'Receiving 2 PT Conversions': 2,
+    # Kicking stats
+    'Made FGs Under 40 Yards': 3, 'Made FGs From 40-49 Yards': 4, 'Made FGs From over 50 Yds': 5,
+    'Made PATs': 1, 'Missed FGs': -1.5, 'Missed PATs': 0,
+    # Defensive stats
+    'Defensive Blocked PATs': 2, 'Defensive Interceptions': 2, 'Defensive Fumbles': 2,
+    'Defensive Blocked Kicks': 2, 'Defensive Safeties': 2, 'Defensive Sacks': 1,
+    'Allowed 0 Points': 5, 'Allowed 1-6 Points': 4, 'Allowed 7-13 Points': 3,
+    'Allowed 14-17 Points': 1, 'Allowed 28-34 Points': -1, 'Allowed 35-45 Points': -3,
+    'Allowed 100-199 Yards': 3, 'Allowed 200-299 Yards': 2, 'Allowed 300-349 Yards': 0,
+    'Allowed 350-399 Yards': -1, 'Allowed 400-449 Yards': -3, 'Allowed 450-499 Yards': -5,
+    'Allowed 500-549 Yards': -6, 'Allowed Over 500 Yards': -7
 }

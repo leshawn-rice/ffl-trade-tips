@@ -1,14 +1,9 @@
-body {
-  background-color: rgb(212, 211, 211);
-}
-
-
 .nav-link {
   padding: 0rem;
 }
 
 .nav-item.active {
-  background-color: #e25664;
+  background-color: #474c52;
   border-radius: 0.8rem;
 }
 
@@ -26,10 +21,6 @@ body {
 .table a {
   color: white;
   box-shadow: lightblue;
-}
-
-#profile-dropdown {
-  margin-right: 100vw;
 }
 
 #profile-phone {
@@ -50,7 +41,12 @@ body {
   display: none;
 }
 
+#player_hidden_div {
+  display: none;
+}
+
 @media only screen and (max-width: 600px) {
+
   #profile-phone {
     display: inline;
   }

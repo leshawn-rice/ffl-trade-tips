@@ -51,7 +51,6 @@ class AddLeagueForm(FlaskForm):
                              InputRequired(message='You must enter a League ID!')])
     year = IntegerField('Year', validators=[InputRequired(
         message='You must enter a year!'), NumberRange(min=2000, max=2021)])
-    is_ppr = BooleanField('PPR', validators=[Optional()])
 
 
 class ContactForm(FlaskForm):

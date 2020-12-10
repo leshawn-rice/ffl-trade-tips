@@ -149,9 +149,6 @@ class UserAuthentication:
         '''
         league_id = form.league_id.data
         year = form.year.data
-        is_ppr = form.is_ppr.data
-        if is_ppr:
-            session['is_ppr'] = True
         espn_request = ESPNRequest(league_id=league_id, year=year)
         data = espn_request.get_response_data()
         return [league_id, year, data]
