@@ -181,12 +181,14 @@ class Player(ESPNBase):
 
     def get_rank(self):
         super().__init__()
-        views = ['kona_playercard']
+        views = ['mRoster']
         params = {'view': views}
         data = self.make_espn_request(params)
-        for p in data['players']:
-            if p['player']['fullName'] == f'{self.first_name} {self.last_name}':
-                return p['ratings']['0']['positionalRanking']
+        for team in data['teams']:
+            for player in team['roster']['entries']:
+                player_data = player['playerPoolEntry']
+                if player_data['id'] == self.id:
+                    return player_data['ratings']['0']['positionalRanking']
         return 0
 
     def get_basic_info(self, data):
