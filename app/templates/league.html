@@ -4,83 +4,55 @@
 
 
 {% block content %}
-<div class="text-center display-1">{{league.name}}</div>
-
-<div class="row justify-content-between text-center">
-
-    <h1 class="display-4">Your Team</h1>
-    <table class="table table-striped">
-        <thead>
-            <tr class="bg-primary text-light">
-                <th>Name</th>
-                <th>Record</th>
-                <th>Points</th>
-                <th>Waiver Position</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><a href="/teams/{{user_team.id}}" class="bg-secondary rounded">{{user_team.team_name}}</a></td>
-                <td>{{user_team.record}}</td>
-                <td>{{user_team.points}}</td>
-                <td>{{user_team.waiver_position}}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <br><br><br>
-
-    <table class="table table-striped" id="teams-table-desktop">
-        <thead>
-            <tr class="bg-danger text-light">
-                <th>Team Name</th>
-                <th>Team Record</th>
-                <th>Team Points</th>
-                <th>Team Waiver Position</th>
-                <th>Team Logo</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for team in league.teams %}
-            <tr>
-                <td><a href="/teams/{{team.id}}" class="bg-secondary rounded">{{team.team_name}}</a></td>
-                <td>{{team.record}}</td>
-                <td>{{team.points}}</td>
-                <td>{{team.waiver_position}}</td>
-                <td><img class="img-fluid" src="{{team.logo_url}}" alt="{{team.team_name}} logo" width=50 height=50>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <table class="table table-striped" id="teams-table-phone">
-        <thead>
-            <tr class="bg-danger text-light">
-                <th>Team Name</th>
-                <th>Team Record</th>
-                <th>Team Points</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for team in league.teams %}
-            <tr>
-                <td><a href="/teams/{{team.id}}" class="bg-secondary rounded">{{team.team_name}}</a></td>
-                <td>{{team.record}}</td>
-                <td>{{team.points}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <form action="/add-league" method="POST">
-        <input name="league_id" type="text" value="{{league.league_id}}" hidden />
-        <input name="year" type="text" value="{{league.year}}" hidden />
-        <button class="btn btn-warning m-2">Refresh League Stats!</button><span class="small">* This
-            will
-            bring you to the add a league page. Simply press enter upon arrival!</span>
-    </form>
-
+<div class="row">
+    <div class="col-12 col-md-4 text-center">
+        <p class="display-4">{{league.name}}</p>
+        <p class="h6">Teams: <span class="lead">{{league.num_teams}}</span></p>
+        <p class="h6">Current Week: <span class="lead">{{league.week}}</span></p>
+        <p class="h6">Top Scorer: <a class="text-light lead"
+                href="/teams/{{league.top_scorer.id}}">{{league.top_scorer.team_name}}</a>
+        </p>
+        <p class="h6">Bottom Scorer: <a class="text-light lead"
+                href="/teams/{{league.bottom_scorer.id}}">{{league.bottom_scorer.team_name}}</a></p>
+        <a class="btn btn-warning mt-2 btn-sm" href="/leagues">Back to Leagues</a>
+    </div>
+    <div class="col-12 col-md-8">
+        <h2 class="display-4 text-center">Teams</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr class="bg-light text-dark">
+                    <th>Name</th>
+                    <th>Record</th>
+                    <th>Points</th>
+                    <th>Waiver Position</th>
+                    <th>Logo</th>
+                </tr>
+            </thead>
+            <tbody class="text-light">
+                <tr>
+                    <td><a href="/teams/{{user_team.id}}">{{user_team.team_name}}</a> <span
+                            class="badge badge-success">Your Team</span></td>
+                    <td>{{user_team.record}}</td>
+                    <td>{{user_team.points}}</td>
+                    <td>{{user_team.waiver_position}}</td>
+                    <td><img src="{{user_team.logo_url}}" alt="{{user_team.team_name}} logo" class="img-fluid" width=50
+                            height=50></td>
+                </tr>
+                {% for team in league.teams %}
+                {% if team.team_name != user_team.team_name %}
+                <tr>
+                    <td><a href="/teams/{{team.id}}">{{team.team_name}}</a></td>
+                    <td>{{team.record}}</td>
+                    <td>{{team.points}}</td>
+                    <td>{{team.waiver_position}}</td>
+                    <td><img class="img-fluid" src="{{team.logo_url}}" alt="{{team.team_name}} logo" width=50 height=50>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% endblock %}

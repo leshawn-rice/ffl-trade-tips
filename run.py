@@ -9,9 +9,6 @@ import espn.views
 
 mail = Mail(app)
 
-# mTeams finalScoringPeriod = lastWeek
-# mTeams scoringPeriodId = currentWeek
-
 # Add change username/email/password
 # Add docs
 # Add tests

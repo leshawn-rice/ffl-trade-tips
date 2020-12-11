@@ -31,6 +31,33 @@
 <hr>
 
 <div class="row">
+    <div class="col-12 col-md-12">
+        <h1 class="display-4 text-center">Saved Trades</h1>
+        <table class="table table-striped text-light mr-5 text-center">
+            <thead>
+                <tr>
+                    <th>Player To Trade</th>
+                    <th>First Trade Suggestion</th>
+                    <th>Second Trade Suggestion</th>
+                    <th>Third Trade Suggestion</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trade in trades %}
+                <tr>
+                    <td> <a href="/players/{{trade['Current Player'].id}}">{{trade['Current Player'].full_name}}</a>
+                    </td>
+                    <td> <a href="/players/{{trade['First Player'].id}}">{{trade['First Player'].full_name}}</a></td>
+                    <td> <a href="/players/{{trade['Second Player'].id}}">{{trade['Second Player'].full_name}}</a></td>
+                    <td> <a href="/players/{{trade['Third Player'].id}}">{{trade['Third Player'].full_name}}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class=" row">
     <div class="col-12 text-center" id='delete-account'>
         <a class="btn btn-lg btn-outline-danger mt-2" href="/users/{{user.id}}/delete" id='delete-btn'>DELETE
             ACCOUNT</a>

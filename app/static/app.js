@@ -81,10 +81,40 @@ async function addPlayerButtons() {
   });
 }
 
+function getPlayerIds(tradeStr) {
+  let trades = [];
+  parsedTrades = tradeStr.split('>, ');
+  for (let trade of parsedTrades) {
+    trade = trade.replace('<', '');
+    trade = trade.replace('>', '');
+    trade = trade.replace('[', '');
+    trade = trade.replace(']', '');
+    trade = trade.replace('PlayerModel ', '');
+    new_arr = trade.split(' team_id')
+    id = new_arr[0].split('=')[1];
+    id = parseInt(id);
+    trades.push(id);
+  }
+  return trades;
+}
+
+async function addSaveTradeBtn() {
+  const $tradeBtn = $('#save-trade-btn');
+  $tradeBtn.click(async () => {
+    let tradeStr = $('#js-player-trades').data('trades');
+    let userId = $('#js-user-id').data('user-id');
+    let tradingPlayerId = $('#js-player-id').data('player-id');
+    let trades = getPlayerIds(tradeStr);
+    let response = await axios.post(`/users/${userId}/save-trade`, { trading_player_id: tradingPlayerId, player_ids: trades });
+    alert('Trade Saved!')
+  });
+}
+
 $(async () => {
   setActiveLinkInNavbar();
   setAddLeagueBtnLink();
   addDeleteAccountAlert();
   addLoadingScreen();
   await addPlayerButtons();
+  await addSaveTradeBtn();
 });
