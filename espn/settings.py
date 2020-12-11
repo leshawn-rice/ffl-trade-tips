@@ -15,6 +15,22 @@ GRADE_MAP = {
     'F': ('D')
 }
 
+GRADE_TO_VALUE {
+    'A': 4,
+    'B': 3,
+    'C': 2,
+    'D': 1,
+    'F': 0
+}
+
+VALUE_TO_GRADE {
+    4: 'A',
+    3: 'B',
+    2: 'C',
+    1: 'D',
+    0: 'F'
+}
+
 POSITIONS = list(set([pos for pos in POSITION_MAP.values()]))
 
 PRO_TEAM_MAP = {

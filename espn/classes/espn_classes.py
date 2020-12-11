@@ -3,7 +3,7 @@ from espn.classes.base_classes import ESPNBase
 from espn.classes.grade_class import GradeCalculator
 from espn.classes.model_handler_classes import LeagueModelHandler, TeamModelHandler, PlayerModelHandler
 from espn.models import LeagueModel, TeamModel, TeamStatModel, PlayerModel, PlayerStatModel
-from espn.settings import PRO_TEAM_MAP, STATS_MAP, POSITION_MAP, STANDARD_SEASON_LENGTH, DEFAULT_STAT_VALUES
+from espn.settings import PRO_TEAM_MAP, STATS_MAP, POSITION_MAP, STANDARD_SEASON_LENGTH, DEFAULT_STAT_VALUES, GRADE_TO_VALUE, VALUE_TO_GRADE
 
 
 class Settings:
@@ -92,20 +92,6 @@ class League(ESPNBase):
                 grader.get_pos_extremes(record)
 
     def get_grades(self, grader):
-        gpa = {
-            'A': 4,
-            'B': 3,
-            'C': 2,
-            'D': 1,
-            'F': 0
-        }
-        gpa_letter = {
-            4: 'A',
-            3: 'B',
-            2: 'C',
-            1: 'D',
-            0: 'F'
-        }
         for team in self.teams:
             team_score = 0
             for player in team.roster:
@@ -113,10 +99,10 @@ class League(ESPNBase):
                     player_id=player.id, league_id=player.league_id).first()
                 record.grade = grader.grade_player(record)
                 db.session.commit()
-                team_score += gpa[record.grade]
+                team_score += GRADE_TO_VALUE[record.grade]
 
             team_grade = team_score / len(team.roster)
-            team_grade = gpa_letter[round(team_grade)]
+            team_grade = VALUE_TO_GRADE[round(team_grade)]
 
             record = TeamModel.query.filter_by(
                 team_id=team.id, league_id=team.league_id, user_id=self.user_id).first()
