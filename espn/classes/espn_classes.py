@@ -222,6 +222,14 @@ class Player(ESPNBase):
         self.position = POSITION_MAP[data['defaultPositionId']]
         self.first_name = data['firstName']
         self.last_name = data['lastName']
+        self.outlooks = []
+        if 'outlooks' in data:
+            for week, outlook in data['outlooks']['outlooksByWeek'].items():
+                int_week = int(week)
+                self.outlooks.append((int_week, outlook))
+        else:
+            self.outlooks = []
+
         self.rank = self.get_rank()
         self.injured = data.get('injured', False)
         self.injury_status = data.get('injuryStatus', 'ACTIVE')

@@ -1,6 +1,6 @@
 from app.database import db, add_to_db
 from espn.classes.base_classes import ModelHandlerBase
-from espn.models import LeagueModel, TeamModel, TeamStatModel, PlayerModel, PlayerStatModel
+from espn.models import LeagueModel, TeamModel, TeamStatModel, PlayerModel, PlayerStatModel, PlayerOutlookModel
 
 
 class LeagueModelHandler(ModelHandlerBase):
@@ -128,6 +128,12 @@ class PlayerModelHandler(ModelHandlerBase):
             new_stat = PlayerStatModel(
                 player_id=new_player.id, league_id=new_player.league_id, stat_name=stat, stat_value=val)
             add_to_db(new_stat)
+
+        if self.instance.outlooks:
+            for outlook in self.instance.outlooks:
+                new_outlook = PlayerOutlookModel(
+                    player_id=new_player.id, league_id=new_player.league_id, week=outlook[0], outlook=outlook[1])
+                add_to_db(new_outlook)
 
     def update_player_stats(self, stat_records):
         player_id = PlayerModel.query.filter_by(

@@ -114,6 +114,7 @@ class PlayerModel(db.Model):
 
     stats = db.relationship(
         'PlayerStatModel', backref='player')
+    outlooks = db.relationship('PlayerOutlookModel', backref='player')
 
     @classmethod
     def get_trade_recs(cls, player):
@@ -145,6 +146,21 @@ class PlayerStatModel(db.Model):
         'leagues.id', ondelete='cascade'))
     stat_name = db.Column(db.Text, nullable=False)
     stat_value = db.Column(db.Float, nullable=False)
+
+
+class PlayerOutlookModel(db.Model):
+    '''
+
+    '''
+    __tablename__ = 'players_outlooks'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    player_id = db.Column(db.Integer, db.ForeignKey(
+        'players.id', ondelete='cascade'))
+    league_id = db.Column(db.Integer, db.ForeignKey(
+        'leagues.id', ondelete='cascade'))
+    week = db.Column(db.Integer, nullable=False)
+    outlook = db.Column(db.Text, nullable=False)
 
 
 class TeamStatModel(db.Model):

@@ -143,7 +143,6 @@ def player_page(player_id):
 @app.route('/players/<int:player_id>/stats-data')
 def get_player_stats(player_id):
     player = PlayerModel.query.get_or_404(player_id)
-    print(player.stats)
     stats = []
     for stat in player.stats:
         stat_dict = {}
@@ -151,3 +150,16 @@ def get_player_stats(player_id):
         stat_dict['value'] = stat.stat_value
         stats.append(stat_dict)
     return (jsonify(stats=stats), 200)
+
+
+@app.route('/players/<int:player_id>/outlooks-data')
+def get_player_outlooks(player_id):
+    player = PlayerModel.query.get_or_404(player_id)
+    outlooks = []
+    for outlook in player.outlooks:
+        outlook_dict = {
+            'week': outlook.week,
+            'outlook': outlook.outlook
+        }
+        outlooks.append(outlook_dict)
+    return (jsonify(outlooks=outlooks), 200)
