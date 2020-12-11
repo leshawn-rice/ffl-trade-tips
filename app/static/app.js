@@ -40,6 +40,11 @@ function addDeleteAccountAlert() {
 }
 
 function addLoadingScreen() {
+  /*
+  Adds loading icon to add league
+  page after add league button is
+  pressed
+  */
   const $content = $('.container-fluid')
   const $addLeagueForm = $('#add-league-form')
   $addLeagueForm.submit(() => {
@@ -60,6 +65,7 @@ async function addPlayerButtons() {
     if ($hiddenDiv.parent().is(':visible')) {
       $hiddenDiv.empty();
       $hiddenDiv.parent().hide();
+      // Hide all titles
       $('#outlook-title-name').hide();
       $('#outlook-title-val').hide();
       $('#stat-title-name').hide()
@@ -90,6 +96,7 @@ async function addPlayerButtons() {
     if ($hiddenDiv.parent().is(':visible')) {
       $hiddenDiv.empty();
       $hiddenDiv.parent().hide();
+      // Hide all titles
       $('#outlook-title-name').hide();
       $('#outlook-title-val').hide();
       $('#stat-title-name').hide()
@@ -119,6 +126,10 @@ async function addPlayerButtons() {
 }
 
 function getPlayerIds(tradeStr) {
+  /*
+  Get the player IDs from the trade
+  suggestion to pass to /users/userId/save-trade
+  */
   let trades = [];
   parsedTrades = tradeStr.split('>, ');
   for (let trade of parsedTrades) {
@@ -136,6 +147,10 @@ function getPlayerIds(tradeStr) {
 }
 
 async function addSaveTradeBtn() {
+  /*
+  Adds event listener to save trade button
+  so users can save their trades to profile
+  */
   const $tradeBtn = $('#save-trade-btn');
   $tradeBtn.click(async () => {
     let tradeStr = $('#js-player-trades').data('trades');
