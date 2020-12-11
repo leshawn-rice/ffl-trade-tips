@@ -2,10 +2,19 @@ import requests
 
 
 class News:
+    '''
+    Class that pulls NFL News from their
+    website'''
+
     def __init__(self):
         self.data = []
 
     def split_link(self, link):
+        '''
+        Splits an HTML link into
+        a link and a source and returns
+        a dict with {'link': link, 'source': source}
+        '''
         link_info = {}
         link_data = link.split('(')
         try:
@@ -18,6 +27,11 @@ class News:
         return link_info
 
     def remove_metadata(self, link):
+        '''
+        Removes unnecessary data from a
+        link so we can get just the link
+        and the source
+        '''
         try:
             para = link.split('</p>')
             heading = para[1].split('</h3>')
@@ -37,6 +51,10 @@ class News:
                 return (None, link)
 
     def add_blank_target(self, link_data):
+        '''
+        Adds target="blank" to a given link
+        so it opens in a new page
+        '''
         try:
             raw_link = link_data['link'].split('>')
             no_close_link = raw_link[0] + ' target="_blank">'
@@ -47,6 +65,11 @@ class News:
         return link_data
 
     def get_news(self):
+        '''
+        Sends a request to ESPN's NFL news page,
+        parses the data, and sets the link into 
+        self.data 
+        '''
         response = requests.get('http://www.espn.com/espn/wire?sportId=28')
         data = response.text
         data.replace('\n', '<br>')

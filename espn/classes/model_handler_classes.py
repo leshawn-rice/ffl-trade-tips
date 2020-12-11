@@ -5,9 +5,18 @@ from espn.models import LeagueModel, TeamModel, TeamStatModel, PlayerModel, Play
 
 class LeagueModelHandler(ModelHandlerBase):
     def __init__(self, current_instance):
+        '''
+        Sets the instance attribute
+        to an instance of the League class
+        '''
         self.instance = current_instance
 
     def add_record(self):
+        '''
+        Adds a new League record to the database,
+        using the information contained in 
+        the instance attribute
+        '''
         if self.instance.cookies:
             new_league = LeagueModel(
                 league_id=self.instance.id, user_id=self.instance.user_id, year=self.instance.year, espn_s2=espn_s2, swid=swid, num_teams=self.instance.num_teams, name=self.instance.name, week=self.instance.week)
@@ -19,6 +28,10 @@ class LeagueModelHandler(ModelHandlerBase):
         self.instance.league_info['league_model_id'] = new_league.id
 
     def update_league_info(self, league):
+        '''
+        Updates the given league's info
+        to the info in the instance attribute
+        '''
         league.name = self.instance.name
         league.week = self.instance.week
         league.year = self.instance.year
@@ -28,12 +41,22 @@ class LeagueModelHandler(ModelHandlerBase):
         db.session.commit()
 
     def update_record(self):
+        '''
+        Updates the league record with
+        the same league id and user id as
+        the instance attribute
+        '''
         league = LeagueModel.query.filter_by(
             league_id=self.instance.id, user_id=self.instance.user_id)
         self.update_league_info(league)
         self.instance.league_info['league_model_id'] = record.id
 
     def check_for_record_update(self):
+        '''
+        Checks to see if the league record
+        with the instance attribute's league
+        id and user id needs to be updated
+        '''
         record = LeagueModel.query.filter_by(
             league_id=self.instance.id, user_id=self.instance.user_id).first()
 
@@ -44,6 +67,11 @@ class LeagueModelHandler(ModelHandlerBase):
             return True
 
     def check_for_record(self):
+        '''
+        Checks if a record with the 
+        current instance's league id and user id
+        already exists
+        '''
         record = LeagueModel.query.filter_by(
             league_id=self.instance.id, user_id=self.instance.user_id).all()
         if record:
@@ -54,9 +82,17 @@ class LeagueModelHandler(ModelHandlerBase):
 
 class TeamModelHandler(ModelHandlerBase):
     def __init__(self, current_instance):
+        '''
+        Sets the instance attribute (team instance) to parameter
+        current_instance
+        '''
         self.instance = current_instance
 
     def add_record(self):
+        '''
+        Adds a new team record to the database
+        using the info from the instance attribute
+        '''
         new_team = TeamModel(team_id=self.instance.id, league_id=self.instance.league_id, accronym=self.instance.accronym,
                              location=self.instance.location, nickname=self.instance.nickname, logo_url=self.instance.logo_url, record=self.instance.record, waiver_position=self.instance.waiver_position, points=self.instance.points, user_id=self.instance.user_id)
         add_to_db(new_team)
@@ -67,6 +103,10 @@ class TeamModelHandler(ModelHandlerBase):
             add_to_db(new_stat)
 
     def update_team_stats(self, stat_records):
+        '''
+        Updates a team's stats in the database
+        given the stat_records passed as a param
+        '''
         stat_names = []
         for stat in stat_records:
             stat_names.append(stat.stat_name)
@@ -81,6 +121,10 @@ class TeamModelHandler(ModelHandlerBase):
         db.session.commit()
 
     def update_team_info(self, team):
+        '''
+        Updates the passed team record with
+        the instance attribute's info
+        '''
         team.acronym = self.instance.accronym
         team.location = self.instance.location
         team.nickname = self.instance.nickname
@@ -91,6 +135,10 @@ class TeamModelHandler(ModelHandlerBase):
         db.session.commit()
 
     def update_record(self):
+        '''
+        Updates the team record with the instance attribute's
+        id and league_id
+        '''
         team = TeamModel.query.filter_by(
             team_id=self.instance.id, league_id=self.instance.league_id).first()
         self.update_team_info(team)
@@ -99,6 +147,10 @@ class TeamModelHandler(ModelHandlerBase):
         self.update_team_stats(stat_records)
 
     def check_for_record_update(self):
+        '''
+        Checks if the team record that matches the instance attribute's
+        id and league id needs to be updated
+        '''
         record = TeamModel.query.filter_by(
             team_id=self.instance.id, league_id=self.instance.league_id).first()
         if (record.accronym == self.instance.accronym and record.location == self.instance.location and record.nickname == self.instance.nickname) and (record.logo_url == self.instance.logo_url and record.record == self.instance.record and record.waiver_position == self.instance.waiver_position) and (record.points == self.instance.points):
@@ -107,6 +159,10 @@ class TeamModelHandler(ModelHandlerBase):
             return True
 
     def check_for_record(self):
+        '''
+        Checks if a team record that matches the instance attribute's
+        id and league id exists
+        '''
         record = TeamModel.query.filter_by(
             team_id=self.instance.id, league_id=self.instance.league_id).all()
         if record:
@@ -117,9 +173,17 @@ class TeamModelHandler(ModelHandlerBase):
 
 class PlayerModelHandler(ModelHandlerBase):
     def __init__(self, current_instance):
+        '''
+        Sets the instance attribute (player instance) to parameter
+        current_instance
+        '''
         self.instance = current_instance
 
     def add_record(self):
+        '''
+        Adds a new player record to the database given
+        the instance attribute's info
+        '''
         new_player = PlayerModel(player_id=self.instance.id, league_id=self.instance.league_id, team_id=self.instance.team_id, first_name=self.instance.first_name, last_name=self.instance.last_name,
                                  pro_team=self.instance.pro_team, position=self.instance.position, points=self.instance.points, projected_points=self.instance.projected_points, position_rank=self.instance.rank)
         add_to_db(new_player)
@@ -136,6 +200,10 @@ class PlayerModelHandler(ModelHandlerBase):
                 add_to_db(new_outlook)
 
     def update_player_stats(self, stat_records):
+        '''
+        Updates a players stats in the database
+        given the stat_records param
+        '''
         player_id = PlayerModel.query.filter_by(
             player_id=self.instance.id, league_id=self.instance.league_id).first().id
         stat_names = []
@@ -143,9 +211,8 @@ class PlayerModelHandler(ModelHandlerBase):
             stat_names.append(stat.stat_name)
             if stat.stat_name in self.instance.stats.keys():
                 stat.stat_value = self.instance.stats[stat.stat_name]
-
         db.session.commit()
-        print(stat_names)
+
         for stat, val in self.instance.stats.items():
             if stat not in stat_names:
                 print(stat)
@@ -155,6 +222,11 @@ class PlayerModelHandler(ModelHandlerBase):
         db.session.commit()
 
     def update_player_info(self, player):
+        '''
+        Updates the player record info in the database
+        that matches the instance attribute's id and
+        league id
+        '''
         player.team_id = self.instance.team_id
         player.first_name = self.instance.first_name
         player.last_name = self.instance.last_name
@@ -166,6 +238,11 @@ class PlayerModelHandler(ModelHandlerBase):
         db.session.commit()
 
     def update_record(self):
+        ''' 
+        Updates the player record
+        that matches the instance attribute's id
+        and league id
+        '''
         player = PlayerModel.query.filter_by(
             player_id=self.instance.id, league_id=self.instance.league_id).first()
         self.update_player_info(player)
@@ -174,6 +251,11 @@ class PlayerModelHandler(ModelHandlerBase):
         self.update_player_stats(stat_records)
 
     def check_for_record_update(self):
+        '''
+        Check if the player record that matches
+        the instance attribute's id and league id
+        needs to be updated
+        '''
         record = PlayerModel.query.filter_by(
             player_id=self.instance.id, league_id=self.instance.league_id).first()
         if (record.team_id == self.instance.team_id and record.first_name == self.instance.first_name and record.last_name == self.instance.last_name) and (record.pro_team == self.instance.pro_team and record.position == self.instance.position and record.position_rank == self.instance.rank) and (record.points == self.instance.points and record.projected_points == self.instance.projected_points):
@@ -182,6 +264,10 @@ class PlayerModelHandler(ModelHandlerBase):
             return True
 
     def check_for_record(self):
+        '''
+        Checks if a player record that matches the
+        instance attribute's id and league id exists
+        '''
         record = PlayerModel.query.filter_by(
             player_id=self.instance.id, league_id=self.instance.league_id).all()
         if record:

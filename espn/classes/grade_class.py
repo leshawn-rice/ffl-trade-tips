@@ -11,6 +11,13 @@ class GradeCalculator:
     '''
 
     def __init__(self, stat_scores):
+        '''
+        Sets necessary info to attributes 
+        (positions, cap, weight, stat_scores),
+        then sets the extremes attributes
+        to values that should be overwritten
+        by player data
+        '''
         self.positions = POSITIONS
         self.cap = 1
         self.weight = 0.05
@@ -44,6 +51,10 @@ class GradeCalculator:
         return current_total
 
     def get_score(self, player):
+        '''
+        Calculates and returns the
+        players weighted score
+        '''
         stats = player.stats
         total = 0
 
@@ -57,6 +68,11 @@ class GradeCalculator:
         return score
 
     def set_grade_ranges(self):
+        '''
+        Calculates grade ranges (A-F)
+        based on previously calculated
+        position extremes (minScore-maxScore)
+        '''
         self.grade_ranges = {}
 
         for position in self.extremes.keys():
@@ -77,8 +93,8 @@ class GradeCalculator:
     def get_pos_extremes(self, player):
         '''
         Gets max and min for the given player's
-        position, and puts it in the session.
-        This is used to get the grade ranges for players.
+        position, and puts it in the extremes attribute.
+        This is used to get the grade ranges for positions.
         '''
         score = self.get_score(player)
 
