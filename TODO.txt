@@ -1,8 +1,3 @@
-1. Get league scoring settings
-2. Add league scoring settings to grade class
-3. Add get pos max/min to before getting grades for league. Possibly get scores for each player, then go back and convert scores to grades with max/min set.
-4. Make trade recs top 3 (if 3 are available), but only suggest players who are BETTER
-5. Create a team grade by averaging grade of players
 6. Add trade simulation.
 7. Generate team/player stats on different page loads, to decrease the amount of time it takes to get all your league data.
 8. Add docs
