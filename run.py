@@ -23,7 +23,7 @@ def send_email(sender, message):
     '''
     msg = Message('Contact From FFL-Trade-Tips', sender=sender,
                   recipients=[email_username])
-    msg.body = message
+    msg.body = f'From email: {sender}\nMessage: {message}'
     mail.send(msg)
 
 
