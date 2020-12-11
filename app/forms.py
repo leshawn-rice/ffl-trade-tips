@@ -79,3 +79,19 @@ class SelectTeamForm(FlaskForm):
     # Add validation for username length (no more than 20 per db)
     team = SelectField('Teams', validators=[
                        InputRequired(message='Team cannot be empty!')])
+
+
+class SimulateTradeForm(FlaskForm):
+    player_qb = SelectField('Player QB')
+    player_rb = SelectField('Player RB')
+    player_wr = SelectField('Player WR')
+    player_te = SelectField('Player TE')
+    player_k = SelectField('Player K')
+    player_dst = SelectField('Player D/ST')
+
+    other_qb = SelectField('Other Team QB')
+    other_rb = SelectField('Other Team RB')
+    other_wr = SelectField('Other Team WR')
+    other_te = SelectField('Other Team TE')
+    other_k = SelectField('Other Team K')
+    other_dst = SelectField('Other Team D/ST')

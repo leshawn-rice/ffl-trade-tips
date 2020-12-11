@@ -6,7 +6,7 @@ from espn.classes.news_class import News
 from espn.models import LeagueModel, TeamModel, PlayerModel
 from user.models import UserModel
 from user.auth import UserAuthentication
-from app.forms import AddLeagueForm, SelectTeamForm
+from app.forms import AddLeagueForm, SelectTeamForm, SimulateTradeForm
 
 authentication = UserAuthentication()
 
@@ -30,6 +30,46 @@ def get_trade_suggestions(player):
         return trade_suggestions[:3]
     else:
         return ['NO PLAYERS FOUND']
+
+
+def add_form_choices(player, form):
+    form.player_qb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'QB', PlayerModel.team_id == player.team_id)]
+    form.player_qb.choices.insert(0, (None, 'NONE'))
+    form.player_rb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'RB', PlayerModel.team_id == player.team_id)]
+    form.player_rb.choices.insert(0, (None, 'NONE'))
+    form.player_wr.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'WR', PlayerModel.team_id == player.team_id)]
+    form.player_wr.choices.insert(0, (None, 'NONE'))
+    form.player_te.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'TE', PlayerModel.team_id == player.team_id)]
+    form.player_te.choices.insert(0, (None, 'NONE'))
+    form.player_k.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'K', PlayerModel.team_id == player.team_id)]
+    form.player_k.choices.insert(0, (None, 'NONE'))
+    form.player_dst.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'D/ST', PlayerModel.team_id == player.team_id)]
+    form.player_dst.choices.insert(0, (None, 'NONE'))
+
+    form.other_qb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'QB', PlayerModel.team_id != player.team_id)]
+    form.other_qb.choices.insert(0, (None, 'NONE'))
+    form.other_rb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'RB', PlayerModel.team_id != player.team_id)]
+    form.other_rb.choices.insert(0, (None, 'NONE'))
+    form.other_wr.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'WR', PlayerModel.team_id != player.team_id)]
+    form.other_wr.choices.insert(0, (None, 'NONE'))
+    form.other_te.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'TE', PlayerModel.team_id != player.team_id)]
+    form.other_te.choices.insert(0, (None, 'NONE'))
+    form.other_k.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'K', PlayerModel.team_id != player.team_id)]
+    form.other_k.choices.insert(0, (None, 'NONE'))
+    form.other_dst.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+        PlayerModel.position == 'D/ST', PlayerModel.team_id != player.team_id)]
+    form.other_dst.choices.insert(0, (None, 'NONE'))
 
 
 @app.route('/recent-news')
@@ -132,15 +172,21 @@ def player_page(player_id):
     player = PlayerModel.query.get_or_404(player_id)
     league = player.league
     if league.user_id == session.get('user_id'):
+        form = SimulateTradeForm()
+        add_form_choices(player, form)
         if request.method == 'POST':
             trade_suggestions = get_trade_suggestions(player)
-            return render_template('player.html', player=player, trade_suggestions=trade_suggestions)
+            if form.validate_on_submit():
+                # Simulate Trade
+                return redirect('/')
+                # redirect to trade simulation page
+            return render_template('player.html', player=player, trade_suggestions=trade_suggestions, form=form)
         else:
-            return render_template('player.html', player=player)
+            return render_template('player.html', player=player, form=form)
     return redirect(f'/teams/{player.team.id}')
 
 
-@app.route('/players/<int:player_id>/stats-data')
+@ app.route('/players/<int:player_id>/stats-data')
 def get_player_stats(player_id):
     player = PlayerModel.query.get_or_404(player_id)
     stats = []
@@ -152,7 +198,7 @@ def get_player_stats(player_id):
     return (jsonify(stats=stats), 200)
 
 
-@app.route('/players/<int:player_id>/outlooks-data')
+@ app.route('/players/<int:player_id>/outlooks-data')
 def get_player_outlooks(player_id):
     player = PlayerModel.query.get_or_404(player_id)
     outlooks = []

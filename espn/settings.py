@@ -15,7 +15,7 @@ GRADE_MAP = {
     'F': ('D')
 }
 
-GRADE_TO_VALUE {
+GRADE_TO_VALUE = {
     'A': 4,
     'B': 3,
     'C': 2,
@@ -23,7 +23,7 @@ GRADE_TO_VALUE {
     'F': 0
 }
 
-VALUE_TO_GRADE {
+VALUE_TO_GRADE = {
     4: 'A',
     3: 'B',
     2: 'C',

@@ -89,6 +89,73 @@
         <div id="player_stats_div">
         </div>
     </div>
-</div>
 
-{% endblock %}
+    <div class="col-12 col-md-8">
+        <h2 class="display-4 text-center">Trade Simulation</h2>
+        <div class="">
+            <form action="" method="POST">
+                {{form.hidden_tag()}}
+                <div class="row">
+                    <div class="col-6">
+                        <p>
+                            {{form.player_qb.label}}
+                            {{form.player_qb(class="form-control")}}
+                        </p>
+                        <p>
+                            {{form.player_rb.label}}
+                            {{form.player_rb(class="form-control")}}
+                        </p>
+                        <p>
+                            {{form.player_wr.label}}
+                            {{form.player_wr(class="form-control")}}
+                        </p>
+                        <p>
+                            {{form.player_te.label}}
+                            {{form.player_te(class="form-control")}}
+                        </p>
+                        <p>
+                            {{form.player_k.label}}
+                            {{form.player_k(class="form-control")}}
+                        </p>
+                        <p>
+                            {{form.player_dst.label}}
+                            {{form.player_dst(class="form-control")}}
+                        </p>
+                    </div>
+                    <div class="col-6">
+                        <p>
+                            {{form.other_qb.label}}
+                            {{form.other_qb(class="form-control")}}
+                        </p>
+                        <p>
+                            {{form.other_rb.label}}
+                            {{form.other_rb(class="form-control")}}
+                        </p>
+                        <p>
+                            {{form.other_wr.label}}
+                            {{form.other_wr(class="form-control")}}
+                        </p>
+                        <p>
+                            {{form.other_te.label}}
+                            {{form.other_te(class="form-control")}}
+                        </p>
+                        <p>
+                            {{form.other_k.label}}
+                            {{form.other_k(class="form-control")}}
+                        </p>
+                        <p>
+                            {{form.other_dst.label}}
+                            {{form.other_dst(class="form-control")}}
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <button class="btn btn-light mb-2">Simulate Trade!</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% endblock %}
