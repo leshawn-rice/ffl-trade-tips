@@ -45,6 +45,21 @@
   display: none;
 }
 
+#stat-title-name {
+  display: none;
+}
+
+#stat-title-val {
+  display: none;
+}
+
+#outlook-title-name {
+  display: none;
+}
+#outlook-title-val {
+  display: none;
+}
+
 @media only screen and (max-width: 600px) {
 
   #profile-phone {

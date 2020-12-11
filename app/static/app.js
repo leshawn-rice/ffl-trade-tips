@@ -53,15 +53,22 @@ function addLoadingScreen() {
 }
 
 async function addPlayerButtons() {
-  const $hiddenDiv = $('#player_stats_div')
-  const $statsBtn = $('#player_stats_btn')
+  const $hiddenDiv = $('#player_stats_div');
+  const $statsBtn = $('#player_stats_btn');
+  const $outlooksBtn = $('#player_outlooks_btn');
   $statsBtn.click(async () => {
     if ($hiddenDiv.parent().is(':visible')) {
       $hiddenDiv.empty();
       $hiddenDiv.parent().hide();
+      $('#outlook-title-name').hide();
+      $('#outlook-title-val').hide();
+      $('#stat-title-name').hide()
+      $('#stat-title-val').hide()
       return;
     }
     else {
+      $('#stat-title-name').show()
+      $('#stat-title-val').show()
       let $playerId = $('#js-player-id').data('player-id');
       let response = await axios.get(`/players/${$playerId}/stats-data`);
       let stats = response.data.stats;
@@ -75,6 +82,36 @@ async function addPlayerButtons() {
         $statSpanText.text(`${statVal}`);
         $statDiv.append($statText).append($statSpanText);
         $hiddenDiv.append($statDiv);
+      }
+      $hiddenDiv.parent().show();
+    }
+  });
+  $outlooksBtn.click(async () => {
+    if ($hiddenDiv.parent().is(':visible')) {
+      $hiddenDiv.empty();
+      $hiddenDiv.parent().hide();
+      $('#outlook-title-name').hide();
+      $('#outlook-title-val').hide();
+      $('#stat-title-name').hide()
+      $('#stat-title-val').hide()
+      return;
+    }
+    else {
+      $('#outlook-title-name').show();
+      $('#outlook-title-val').show();
+      let $playerId = $('#js-player-id').data('player-id');
+      let response = await axios.get(`/players/${$playerId}/outlooks-data`);
+      let outlooks = response.data.outlooks;
+      for (let outlook of outlooks) {
+        let $outlookDiv = $('<div class="d-flex justify-content-between border-bottom">');
+        let week = outlook['week'];
+        let look = outlook['outlook'];
+        let $weekText = $('<p class="h6">');
+        $weekText.text(`Week ${week}: `);
+        let $outlookText = $('<p class="lead ml-5">');
+        $outlookText.text(`${look}`);
+        $outlookDiv.append($weekText).append($outlookText);
+        $hiddenDiv.append($outlookDiv);
       }
       $hiddenDiv.parent().show();
     }
