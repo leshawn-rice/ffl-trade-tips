@@ -5,6 +5,8 @@
 
 {% block content %}
 
+<meta id="js-league-id" data-league-id="{{league.id}}">
+
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 {% for category, message in messages %}
@@ -24,6 +26,7 @@
         <p class="h6">Bottom Scorer: <a class="text-light lead"
                 href="/teams/{{league.bottom_scorer.id}}">{{league.bottom_scorer.team_name}}</a></p>
         <a class="btn btn-warning mt-2 btn-sm" href="/leagues">Back to Leagues</a>
+        <button class="btn btn-danger mt-2 btn-sm" id="delete-league-btn">Delete League</button>
     </div>
     <div class="col-12 col-md-8">
         <h2 class="display-4 text-center">Teams</h2>

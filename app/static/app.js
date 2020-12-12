@@ -1,6 +1,3 @@
-// I want to remove form from add_league
-// page once the add league btn is clicked
-
 function setActiveLinkInNavbar() {
   /*
     Sets the href for the current
@@ -57,10 +54,11 @@ function addLoadingScreen() {
   });
 }
 
-async function addPlayerButtons() {
-  const $hiddenDiv = $('#player_stats_div');
-  const $statsBtn = $('#player_stats_btn');
-  const $outlooksBtn = $('#player_outlooks_btn');
+async function addStatsButton($hiddenDiv, $statsBtn) {
+  /*
+  Adds the event listener to the stats
+  button on the player page
+  */
   $statsBtn.click(async () => {
     if ($hiddenDiv.parent().is(':visible')) {
       $hiddenDiv.empty();
@@ -92,6 +90,13 @@ async function addPlayerButtons() {
       $hiddenDiv.parent().show();
     }
   });
+}
+
+async function addOutlooksButton($hiddenDiv, $outlooksBtn) {
+  /*
+  Adds the event listener to the outlooks
+  button on the player page
+  */
   $outlooksBtn.click(async () => {
     if ($hiddenDiv.parent().is(':visible')) {
       $hiddenDiv.empty();
@@ -123,6 +128,18 @@ async function addPlayerButtons() {
       $hiddenDiv.parent().show();
     }
   });
+}
+
+async function addPlayerButtons() {
+  /*
+  Adds event listeners to the stats and
+  outlooks buttons on the player page
+  */
+  const $hiddenDiv = $('#player_stats_div');
+  const $statsBtn = $('#player_stats_btn');
+  const $outlooksBtn = $('#player_outlooks_btn');
+  await addStatsButton($hiddenDiv, $statsBtn);
+  await addOutlooksButton($hiddenDiv, $outlooksBtn);
 }
 
 function getPlayerIds(tradeStr) {
@@ -162,11 +179,37 @@ async function addSaveTradeBtn() {
   });
 }
 
-$(async () => {
+function addDeleteLeagueAlert() {
+  /*
+  Adds an alert so users dont accidentally delete their
+  league by accident
+  */
+  $btn = $('#delete-league-btn')
+  $btn.click((event) => {
+    event.preventDefault();
+    let isProceeding = confirm('Are you sure you would like to delete this league?')
+    if (isProceeding) {
+      let $leagueId = $('#js-league-id').data('league-id');
+      location = `/leagues/${$leagueId}/delete`
+    }
+  });
+}
+
+async function addPageItems() {
+  /*
+  Adds necessary items to the page,
+  as well as event listeners on 
+  necessary page elements
+  */
   setActiveLinkInNavbar();
   setAddLeagueBtnLink();
   addDeleteAccountAlert();
+  addDeleteLeagueAlert();
   addLoadingScreen();
   await addPlayerButtons();
   await addSaveTradeBtn();
+}
+
+$(async () => {
+  await addPageItems();
 });

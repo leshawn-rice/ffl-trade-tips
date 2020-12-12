@@ -39,6 +39,7 @@ class LeagueSettings:
         for stat in scoring_items:
             if stat['statId'] in STATS_MAP:
                 stat_name = STATS_MAP[stat['statId']]
+                # '16' designates a custom stat
                 if '16' in stat['pointsOverrides']:
                     self.scoring_settings[stat_name] = stat['pointsOverrides']['16']
                 else:
@@ -55,6 +56,7 @@ class League(ESPNBase):
         '''
         self.id = league_id
         self.year = year
+        # Cookies are currently unnecessary, but will be needed for private league support in v2
         self.cookies = cookies
         self.user_id = user_id
         self.league_info = {'league_model_id': None, 'league_id': self.id,
@@ -62,6 +64,11 @@ class League(ESPNBase):
         self.create_league()
 
     def get_data(self):
+        '''
+        Gets the data for the league,
+        we use this data to create the league,
+        every team, and every player
+        '''
         super().__init__()
         views = ['mTeam', 'mRoster', 'mSettings', 'kona_playercard']
         params = {'view': views}
@@ -120,11 +127,6 @@ class League(ESPNBase):
 
         self.num_teams = len(self.teams)
 
-    def handle_db(self):
-        '''Handles adding league info to the database'''
-        db_handler = LeagueModelHandler(self)
-        db_handler.add_or_update_record()
-
     def get_scoring_ranges(self, grader):
         '''
         Gets the max and min score
@@ -168,10 +170,19 @@ class League(ESPNBase):
         grader.set_grade_ranges()
         self.get_grades(grader)
 
+    def handle_db(self):
+        '''Handles adding league info to the database'''
+        # The purpose of this is to make it so we can
+        # Refresh league stats without having to worry
+        # About whether a record already exists
+        db_handler = LeagueModelHandler(self)
+        db_handler.add_or_update_record()
+
     def create_league(self):
         '''
         Calls functions needed to
-        create the league'''
+        create the league
+        '''
         self.get_data()
         self.get_basic_info()
         self.get_settings()
@@ -223,12 +234,14 @@ class Team(ESPNBase):
         given the JSON for the player from the API, 
         then adds them to the roster attribute
         '''
-        ranking = player['playerPoolEntry']['ratings']['0']['positionalRanking'] if 'playerPoolEntry' in player else 0
+        # Some of the data from the API is strange, if we cannot find the ranking with playerPoolEntry
+        # Then the player does not have a ranking
+        rank = player['playerPoolEntry']['ratings']['0']['positionalRanking'] if 'playerPoolEntry' in player else 0
         player_data = player['playerPoolEntry']['player'] if 'playerPoolEntry' in player else player['player']
         team_id = TeamModel.query.filter_by(
             team_id=self.id, league_id=self.league_id, user_id=self.user_id).first().id
         new_player = Player(
-            data=player_data, league_info=self.league_info, team_id=team_id, ranking=ranking)
+            data=player_data, league_info=self.league_info, team_id=team_id, rank=rank)
         self.roster.add(new_player)
 
     def get_roster(self):
@@ -243,6 +256,7 @@ class Team(ESPNBase):
 
     def handle_db(self):
         '''Handles adding the team to the database'''
+        # Used to add or update the db as needed
         db_handler = TeamModelHandler(self)
         db_handler.add_or_update_record()
 
@@ -257,7 +271,7 @@ class Team(ESPNBase):
 class Player(ESPNBase):
     '''ESPN API Wrapper for Players'''
 
-    def __init__(self, data, league_info, team_id, ranking):
+    def __init__(self, data, league_info, team_id, rank):
         '''
         Gets basic player info and calls driving
         function
@@ -267,7 +281,7 @@ class Player(ESPNBase):
         self.league_id = league_info.get('league_model_id')
         self.league_info['team_id'] = team_id
         self.data = data
-        self.rank = ranking
+        self.rank = rank
         self.create_player()
 
     def get_basic_info(self):
@@ -281,6 +295,7 @@ class Player(ESPNBase):
         self.first_name = self.data['firstName']
         self.last_name = self.data['lastName']
         self.outlooks = []
+        # Some players don't have any outlooks, so we need this if statement
         if 'outlooks' in self.data:
             for week, outlook in self.data['outlooks']['outlooksByWeek'].items():
                 int_week = int(week)
@@ -291,6 +306,7 @@ class Player(ESPNBase):
         self.injured = self.data.get('injured', False)
         self.injury_status = self.data.get('injuryStatus', 'ACTIVE')
         self.pro_team = PRO_TEAM_MAP[self.data.get('proTeamId')]
+        # Some players may be owned, but not on a pro team, thus we need to check for this
         if self.pro_team == 'None':
             self.pro_team = 'FA'
 
@@ -300,12 +316,15 @@ class Player(ESPNBase):
         from the API and adds it to the
         stats attribute
         '''
+        # The data['stats'] has many entries, but we only need the year that the league
+        # is currently in. So we filter with 00YEAR
         year = self.league_info['year']
         year_id = f'00{year}'
 
         stat_block = [x for x in self.data['stats'] if x['id'] == year_id][0]
         self.points = stat_block['appliedTotal']
         self.points = round(self.points, 2)
+        # Currently pulling point_avg from the API, but could be calculated using points / current week
         self.point_avg = stat_block['appliedAverage']
         self.projected_points = self.point_avg * \
             self.league_info['total_weeks']
@@ -327,6 +346,7 @@ class Player(ESPNBase):
 
     def handle_db(self):
         '''Handles adding the instance to the database'''
+        # Allows us to add or update without any crazy logic
         db_handler = PlayerModelHandler(self)
         db_handler.add_or_update_record()
 

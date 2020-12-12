@@ -1,6 +1,6 @@
 from flask import render_template, redirect, session, request, jsonify, flash
 from app.app import app
-from app.database import db
+from app.database import db, delete_from_db
 from espn.settings import POSITIONS, GRADE_MAP
 from espn.classes.news_class import News
 from espn.classes.league_handler_class import LeagueHandler
@@ -11,7 +11,8 @@ from app.forms import AddLeagueForm, SelectTeamForm, SimulateTradeForm
 league_handler = LeagueHandler()
 
 
-def delete_league(league_id):
+def do_delete_league(league_id):
+    '''Deletes the league from the db'''
     league = LeagueModel.query.get_or_404(league_id)
     delete_from_db(league)
     flash('League Deleted Successfuly', 'success')
@@ -44,6 +45,8 @@ def set_trade_sim_choices(player, form):
     players team and not on their team, and puts them
     in a list of choices for their respective category
     '''
+
+    # Ideally this would be in a loop, but I'm not quite sure how to do that
     form.player_qb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
         PlayerModel.position == 'QB', PlayerModel.team_id == player.team_id)]
     form.player_qb.choices.insert(0, (None, 'NONE'))
@@ -174,7 +177,7 @@ def show_trade_sim(league_id):
             return redirect(f'/leagues/{league_id}')
 
 
-@app.route('/users/<int:league_id>/delete')
+@app.route('/leagues/<int:league_id>/delete')
 def delete_league(league_id):
     '''
     Deletes the league with id league_id from
@@ -185,7 +188,7 @@ def delete_league(league_id):
     if 'user_id' not in session:
         flash('You need to be logged in to do that!', 'danger')
     elif league.user_id == session.get('user_id'):
-        delete_league(league_id)
+        do_delete_league(league_id)
     else:
         flash('You cannot delete an account that isn\'t yours!', 'danger')
     return redirect('/')

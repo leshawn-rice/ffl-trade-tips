@@ -5,7 +5,14 @@ from espn.settings import GRADE_MAP
 class LeagueModel(db.Model):
     '''
     id: primary key, from API
+    league_id: int that holds ESPN league id
+    user_id: int FK connected to users
+    year: int that holds ESPN year
+    espn_s2: text holds espn_s2 for private leagues
+    swid: text holds swid for private leagues
+    name: text holds league name
     num_teams: int, number of owned teams in the league
+    user_team: int holds id for the team the user claimed
     '''
     __tablename__ = 'leagues'
 
@@ -26,7 +33,13 @@ class LeagueModel(db.Model):
     teams = db.relationship(
         'TeamModel', backref='league')
 
+    def __repr__(self):
+        return f'<LeagueModel id={self.id} league_id={self.league_id} year={self.year} user_id={self.user_id}>'
+
     def get_top_team(self):
+        '''
+        Returns the team with the most points
+        '''
         most_points = 0
         top_team = None
         for team in self.teams:
@@ -36,6 +49,9 @@ class LeagueModel(db.Model):
         return top_team
 
     def get_bottom_team(self):
+        '''
+        Returns the team with the least points
+        '''
         least_points = 100000
         bottom_team = None
         for team in self.teams:
@@ -52,7 +68,15 @@ class TeamModel(db.Model):
     '''
     team_id: primary key, from API, set to unique due to error thrown when adding
     league_id: primary key, foreign key, from leagues table
-    owner_id: primary key, foreign key, from users table
+    user_id: primary key, foreign key, from users table
+    accronym: text accronym for the team
+    location: text location for team (first half of name)
+    nickname: text nickname for team (second half of name)
+    logo_url: text url for team logo
+    record: text Win-Loss record for team
+    waiver_position: int team's position on the waivers
+    points: float team total points
+    grade: text team letter grade
     '''
     __tablename__ = 'teams'
 
@@ -78,7 +102,7 @@ class TeamModel(db.Model):
         'TeamStatModel', backref='team', cascade='all, delete')
 
     def __repr__(self):
-        return f'<TeamModel id={self.id}, team_name={self.team_name}, record={self.record}>'
+        return f'<TeamModel id={self.id} team_id={self.team_id} league_id={self.league_id} user_id={self.user_id}>'
 
     def get_team_name(self):
         return f'{self.location} {self.nickname}'
@@ -89,8 +113,17 @@ class TeamModel(db.Model):
 class PlayerModel(db.Model):
     '''
     id: primary key, from API
-    name: text, name of player
-    nfl_team: text, name of pro team (change to pro team for bball)
+    player_id: int ESPN player id
+    team_id: int FK connected to teams
+    league_id: int FK connected to leagues
+    first_name: text player first name
+    last_name: text player last name
+    pro_team: text player current pro team
+    position: text player position
+    points: float player total points
+    projected_points: float player projected points
+    position_rank: int player rank in their position
+    grade: text player letter grade
     '''
     __tablename__ = 'players'
 
@@ -114,14 +147,6 @@ class PlayerModel(db.Model):
         'PlayerStatModel', backref='player')
     outlooks = db.relationship('PlayerOutlookModel', backref='player')
 
-    @classmethod
-    def get_trade_recs(cls, player):
-        grades_to_check = GRADE_MAP[player.grade]
-        matching_players = cls.query.filter(
-            cls.grade in grades_to_check, cls.position == player.position)  # prolly wont work lol
-
-        return matching_players
-
     def __repr__(self):
         return f'<PlayerModel id={self.id} team_id={self.team_id} league_id={self.league_id} name={self.full_name} grade={self.grade}>'
 
@@ -133,7 +158,11 @@ class PlayerModel(db.Model):
 
 class PlayerStatModel(db.Model):
     '''
-
+    id: int serial primary key
+    player_id: int FK connected to players
+    league_id: int FK connected to leagues
+    stat_name: text name of stat
+    stat_value: float points in stat
     '''
     __tablename__ = 'players_stats'
 
@@ -148,7 +177,11 @@ class PlayerStatModel(db.Model):
 
 class PlayerOutlookModel(db.Model):
     '''
-
+    id: int serial primary key
+    player_id: int FK connected to players
+    league_id: int FK connected to leagues
+    week: int week of outlook
+    outlook: text outlook text
     '''
     __tablename__ = 'players_outlooks'
 
@@ -163,7 +196,11 @@ class PlayerOutlookModel(db.Model):
 
 class TeamStatModel(db.Model):
     '''
-
+    id: int serial primary key
+    team_id: int FK connected to teams
+    league_id: int FK connected to leagues
+    stat_name: text name of stat
+    stat_value: float points in stat
     '''
     __tablename__ = 'teams_stats'
 

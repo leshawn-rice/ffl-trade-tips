@@ -4,7 +4,7 @@ from app.database import db
 class UserModel(db.Model):
     '''
     id: primary key, autoincrements
-    username: str with max-length 20, unique
+    username: text, unique
     email: text, unique
     password: text
     '''
@@ -21,6 +21,12 @@ class UserModel(db.Model):
 
 
 class TradeModel(db.Model):
+    '''
+    id: int primary key serial
+    user_id: int FK connected to users
+    player_to_trade: int FK onnected to players
+    first/second/third_player: int FK connected to players
+    '''
 
     __tablename__ = 'trades'
 

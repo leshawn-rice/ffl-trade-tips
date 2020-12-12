@@ -54,9 +54,9 @@ class ESPNBase:
         to make an espn request to get
         data for the current object
         '''
-        self.r_league_id = self.league_info['league_id']
-        self.r_year = self.league_info['year']
-        self.r_cookies = self.league_info['cookies']
+        self._league_id = self.league_info['league_id']
+        self._year = self.league_info['year']
+        self._cookies = self.league_info['cookies']
 
     def make_espn_request(self, params=None):
         '''
@@ -64,7 +64,7 @@ class ESPNBase:
         instantiating an ESPNRequest object
         '''
         _request = ESPNRequest(
-            league_id=self.r_league_id, year=self.r_year, cookies=self.r_cookies)
+            league_id=self._league_id, year=self._year, cookies=self._cookies)
         return _request.get_response_data(params=params)
 
     def add_stats(self, stats_to_check):

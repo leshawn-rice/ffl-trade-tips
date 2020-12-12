@@ -9,7 +9,7 @@ from espn.models import PlayerModel
 authentication = UserAuthentication()
 
 
-def delete_user(user_id):
+def do_delete_user(user_id):
     user = UserModel.query.get_or_404(user_id)
     delete_from_db(user)
     flash('Account Deleted Successfuly', 'success')
@@ -138,7 +138,7 @@ def delete_user(user_id):
     if 'user_id' not in session:
         flash('You need to be logged in to do that!', 'danger')
     elif user_id == session.get('user_id'):
-        delete_user(user_id)
+        do_delete_user(user_id)
         return redirect('/sign-out')
     else:
         flash('You cannot delete an account that isn\'t yours!', 'danger')

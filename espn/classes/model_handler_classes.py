@@ -17,6 +17,7 @@ class LeagueModelHandler(ModelHandlerBase):
         using the information contained in 
         the instance attribute
         '''
+        # Currently obsolete, but will be useful with private leagues
         if self.instance.cookies:
             new_league = LeagueModel(
                 league_id=self.instance.id, user_id=self.instance.user_id, year=self.instance.year, espn_s2=espn_s2, swid=swid, num_teams=self.instance.num_teams, name=self.instance.name, week=self.instance.week)
@@ -25,6 +26,7 @@ class LeagueModelHandler(ModelHandlerBase):
                 league_id=self.instance.id, user_id=self.instance.user_id, year=self.instance.year, num_teams=self.instance.num_teams, name=self.instance.name, week=self.instance.week)
 
         add_to_db(new_league)
+        # We set this to league info so the teams and players can access it
         self.instance.league_info['league_model_id'] = new_league.id
 
     def update_league_info(self, league):
@@ -59,7 +61,7 @@ class LeagueModelHandler(ModelHandlerBase):
         '''
         record = LeagueModel.query.filter_by(
             league_id=self.instance.id, user_id=self.instance.user_id).first()
-
+        # Check if the important data points have changed, if so return false (dont update), otherwise true (do update)
         if (record.year == self.instance.year) and (record.num_teams == self.instance.num_teams) and (record.name == self.instance.name) and (record.week == self.instance.week):
             self.instance.league_info['league_model_id'] = record.id
             return False
@@ -97,6 +99,7 @@ class TeamModelHandler(ModelHandlerBase):
                              location=self.instance.location, nickname=self.instance.nickname, logo_url=self.instance.logo_url, record=self.instance.record, waiver_position=self.instance.waiver_position, points=self.instance.points, user_id=self.instance.user_id)
         add_to_db(new_team)
 
+        # When we create a new team we also create their stats
         for stat, val in self.instance.stats.items():
             new_stat = TeamStatModel(
                 team_id=new_team.id, league_id=self.instance.league_id, stat_name=stat, stat_value=val)
@@ -113,6 +116,8 @@ class TeamModelHandler(ModelHandlerBase):
             if stat.stat_name in self.instance.stats.keys():
                 stat.stat_value = self.instance.stats[stat.stat_name]
 
+        # Because this is an update, not every stat in the instance stats will be included
+        # in the db, so we need to check if its in db after updating the stats in the db
         for stat in self.instance.stats.keys():
             if stat not in stat_names:
                 new_stat = TeamStatModel(
@@ -151,6 +156,7 @@ class TeamModelHandler(ModelHandlerBase):
         Checks if the team record that matches the instance attribute's
         id and league id needs to be updated
         '''
+        # Same as league, check important team info then update return false if no update, or true if needs update
         record = TeamModel.query.filter_by(
             team_id=self.instance.id, league_id=self.instance.league_id).first()
         if (record.accronym == self.instance.accronym and record.location == self.instance.location and record.nickname == self.instance.nickname) and (record.logo_url == self.instance.logo_url and record.record == self.instance.record and record.waiver_position == self.instance.waiver_position) and (record.points == self.instance.points):
@@ -213,6 +219,7 @@ class PlayerModelHandler(ModelHandlerBase):
                 stat.stat_value = self.instance.stats[stat.stat_name]
         db.session.commit()
 
+        # Just like with the team, stat records may not match all stats, so we check and add if they dont exist
         for stat, val in self.instance.stats.items():
             if stat not in stat_names:
                 print(stat)
@@ -256,6 +263,7 @@ class PlayerModelHandler(ModelHandlerBase):
         the instance attribute's id and league id
         needs to be updated
         '''
+        # Same as league and team, check important info, return true if needed, otherwise return false
         record = PlayerModel.query.filter_by(
             player_id=self.instance.id, league_id=self.instance.league_id).first()
         if (record.team_id == self.instance.team_id and record.first_name == self.instance.first_name and record.last_name == self.instance.last_name) and (record.pro_team == self.instance.pro_team and record.position == self.instance.position and record.position_rank == self.instance.rank) and (record.points == self.instance.points and record.projected_points == self.instance.projected_points):

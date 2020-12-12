@@ -9,8 +9,6 @@ import espn.views
 
 mail = Mail(app)
 
-# Add change username/email/password
-# Add docs
 # Add tests
 # Update readme
 # Deploy
