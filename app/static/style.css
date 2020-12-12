@@ -23,36 +23,28 @@
   box-shadow: lightblue;
 }
 
+/*  */
 #profile-phone {
   display: none;
 }
 #profile-desktop {
   display: inline;
 }
-
 #settings-phone {
   display: none;
 }
 #settings-desktop {
   display: inline;
 }
-
-#teams-table-phone {
-  display: none;
-}
-
 #player_hidden_div {
   display: none;
 }
-
 #stat-title-name {
   display: none;
 }
-
 #stat-title-val {
   display: none;
 }
-
 #outlook-title-name {
   display: none;
 }
@@ -66,13 +58,6 @@
     display: inline;
   }
   #profile-desktop {
-    display: none;
-  }
-
-  #teams-table-phone {
-    display: block;
-  }
-  #teams-table-desktop {
     display: none;
   }
 
