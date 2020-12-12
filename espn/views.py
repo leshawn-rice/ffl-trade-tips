@@ -3,12 +3,12 @@ from app.app import app
 from app.database import db
 from espn.settings import POSITIONS, GRADE_MAP
 from espn.classes.news_class import News
+from espn.classes.league_handler import LeagueHandler
 from espn.models import LeagueModel, TeamModel, PlayerModel
 from user.models import UserModel
-from user.auth import UserAuthentication
 from app.forms import AddLeagueForm, SelectTeamForm, SimulateTradeForm
 
-authentication = UserAuthentication()
+league_handler = LeagueHandler()
 
 
 def get_trade_suggestions(player):
@@ -97,7 +97,7 @@ def add_league():
     form = AddLeagueForm()
 
     if form.validate_on_submit():
-        league = authentication.add_league(form)
+        league = league_handler.add_league(form)
         if league:
             user_id = session.get('user_id')
             league_model = LeagueModel.query.filter_by(
