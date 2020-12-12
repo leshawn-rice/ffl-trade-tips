@@ -22,3 +22,12 @@ def add_to_db(item_to_add):
     '''
     db.session.add(item_to_add)
     db.session.commit()
+
+
+def delete_from_db(item_to_delete):
+    '''
+    Removes the parameter item
+    from the database
+    '''
+    db.session.delete(item_to_delete)
+    db.session.commit()

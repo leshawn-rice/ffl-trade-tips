@@ -3,7 +3,7 @@ from app.app import app
 from app.database import db
 from espn.settings import POSITIONS, GRADE_MAP
 from espn.classes.news_class import News
-from espn.classes.league_handler import LeagueHandler
+from espn.classes.league_handler_class import LeagueHandler
 from espn.models import LeagueModel, TeamModel, PlayerModel
 from user.models import UserModel
 from app.forms import AddLeagueForm, SelectTeamForm, SimulateTradeForm
@@ -179,11 +179,7 @@ def player_page(player_id):
     if league.user_id == session.get('user_id'):
         form = SimulateTradeForm()
         set_trade_sim_choices(player, form)
-        if form.validate_on_submit():
-            # Simulate Trade
-            return redirect('/')
-            # redirect to trade simulation page
-        if request.method == 'POST':
+        if request.form.get('player_grade'):
             trade_suggestions = get_trade_suggestions(player)
             return render_template('player.html', player=player, trade_suggestions=trade_suggestions, form=form)
         else:
@@ -214,3 +210,11 @@ def get_player_outlooks(player_id):
         }
         outlooks.append(outlook_dict)
     return (jsonify(outlooks=outlooks), 200)
+
+
+@app.route('/leagues/<int:league_id>/trade-sim', methods=['POST'])
+def show_trade_sim(league_id):
+    form = SimulateTradeForm()
+    if form.validate_on_submit:
+        new_team = league_handler.simulate_trade(form)
+        return render_template('trade_sim.html', team=new_team)

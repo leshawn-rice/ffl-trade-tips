@@ -1,12 +1,54 @@
 from flask import redirect, render_template, session, flash, request, jsonify
 from app.app import app
-from app.database import db
+from app.database import db, add_to_db, delete_from_db
 from app.forms import LoginForm, CreateUserForm, AddLeagueForm
 from user.auth import UserAuthentication
 from user.models import UserModel, TradeModel
 from espn.models import PlayerModel
 
 authentication = UserAuthentication()
+
+
+def delete_user(user_id):
+    user = UserModel.query.get_or_404(user_id)
+    delete_from_db(user)
+    flash('Account Deleted Successfuly', 'success')
+
+
+def create_saved_trade_data(user_id):
+    data = request.json
+    current_player_id = data['trading_player_id']
+    trading_player_ids = data['player_ids']
+    num_trades = len(trading_player_ids)
+    if num_trades == 0:
+        return False
+    if num_trades == 1:
+        new_trade = TradeModel(
+            user_id=user_id, player_to_trade=current_player_id, first_player=trading_player_ids[0])
+    if num_trades == 2:
+        new_trade = TradeModel(
+            user_id=user_id, player_to_trade=current_player_id, first_player=trading_player_ids[0], second_player=trading_player_ids[1])
+    if num_trades == 3:
+        new_trade = TradeModel(
+            user_id=user_id, player_to_trade=current_player_id, first_player=trading_player_ids[0], second_player=trading_player_ids[1], third_player=trading_player_ids[2])
+    return new_trade
+
+
+def get_saved_trades(saved_trades):
+    trades = []
+    for trade_data in saved_trades:
+        current_player = PlayerModel.query.get(trade_data.player_to_trade)
+        first_player = PlayerModel.query.get(trade_data.first_player)
+        second_player = PlayerModel.query.get(trade_data.second_player)
+        third_player = PlayerModel.query.get(trade_data.third_player)
+        trade = {
+            'Current Player': current_player,
+            'First Player': first_player,
+            'Second Player': second_player,
+            'Third Player': third_player
+        }
+        trades.append(trade)
+    return trades
 
 
 @app.route('/profile')
@@ -19,21 +61,9 @@ def profile_page():
         return redirect('/')
     user_id = session.get('user_id')
     user = UserModel.query.get_or_404(user_id)
-    trades_a = TradeModel.query.filter_by(user_id=user_id).all()
-    trades = []
-    for t in trades_a:
-        current_player = PlayerModel.query.get(t.player_to_trade)
-        first_player = PlayerModel.query.get(t.first_player)
-        second_player = PlayerModel.query.get(t.second_player)
-        third_player = PlayerModel.query.get(t.third_player)
-        trade = {
-            'Current Player': current_player,
-            'First Player': first_player,
-            'Second Player': second_player,
-            'Third Player': third_player
-        }
-        trades.append(trade)
-    print(trades)
+    saved_trades = TradeModel.query.filter_by(user_id=user_id).all()
+    trades = get_saved_trades(saved_trades)
+
     return render_template('profile.html', user=user, trades=trades)
 
 
@@ -108,10 +138,7 @@ def delete_user(user_id):
     if 'user_id' not in session:
         flash('You need to be logged in to do that!', 'danger')
     elif user_id == session.get('user_id'):
-        user = UserModel.query.get_or_404(user_id)
-        db.session.delete(user)
-        db.session.commit()
-        flash('Account Deleted Successfuly', 'success')
+        delete_user(user_id)
         return redirect('/sign-out')
     else:
         flash('You cannot delete an account that isn\'t yours!', 'danger')
@@ -120,22 +147,10 @@ def delete_user(user_id):
 
 @app.route('/users/<int:user_id>/save-trade', methods=['POST'])
 def save_trade(user_id):
-    data = request.json
-    current_player_id = data['trading_player_id']
-    trading_player_ids = data['player_ids']
-    num_trades = len(trading_player_ids)
-    if num_trades == 0:
-        return (jsonify({'message': 'No Trade To Save!'}), 200)
-    if num_trades == 1:
-        new_trade = TradeModel(
-            user_id=user_id, player_to_trade=current_player_id, first_player=trading_player_ids[0])
-    if num_trades == 2:
-        new_trade = TradeModel(
-            user_id=user_id, player_to_trade=current_player_id, first_player=trading_player_ids[0], second_player=trading_player_ids[1])
-    if num_trades == 3:
-        new_trade = TradeModel(
-            user_id=user_id, player_to_trade=current_player_id, first_player=trading_player_ids[0], second_player=trading_player_ids[1], third_player=trading_player_ids[2])
-    db.session.add(new_trade)
-    db.session.commit()
+    new_trade = create_saved_trade_data(user_id)
 
+    if not new_trade:
+        return jsonify({'message': 'No Trades to save!'}, 200)
+
+    add_to_db(new_trade)
     return (jsonify({'message': 'Trade Saved!'}), 200)

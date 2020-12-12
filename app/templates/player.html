@@ -93,7 +93,7 @@
     <div class="col-12 col-md-8">
         <h2 class="display-4 text-center">Trade Simulation</h2>
         <div class="">
-            <form action="" method="POST">
+            <form action="/leagues/{{player.league.id}}/trade-sim" method="POST">
                 {{form.hidden_tag()}}
                 <div class="row">
                     <div class="col-6">
