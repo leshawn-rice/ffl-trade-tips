@@ -4,6 +4,15 @@
 
 
 {% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{category}} text-center">{{ message }}</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
 <div class="row">
     <div class="col-12 col-md-4 text-center">
         <p class="display-4">{{league.name}}</p>

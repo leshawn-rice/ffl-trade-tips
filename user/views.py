@@ -51,22 +51,6 @@ def get_saved_trades(saved_trades):
     return trades
 
 
-@app.route('/profile')
-def profile_page():
-    '''
-    Renders the users profile page
-    if they're logged in
-    '''
-    if 'user_id' not in session:
-        return redirect('/')
-    user_id = session.get('user_id')
-    user = UserModel.query.get_or_404(user_id)
-    saved_trades = TradeModel.query.filter_by(user_id=user_id).all()
-    trades = get_saved_trades(saved_trades)
-
-    return render_template('profile.html', user=user, trades=trades)
-
-
 @app.route('/sign-out')
 def signout():
     '''Signs the current user out'''
@@ -126,6 +110,22 @@ def signup():
             return render_template('signup.html', form=form)
     else:
         return render_template('signup.html', form=form)
+
+
+@app.route('/profile')
+def profile_page():
+    '''
+    Renders the users profile page
+    if they're logged in
+    '''
+    if 'user_id' not in session:
+        return redirect('/')
+    user_id = session.get('user_id')
+    user = UserModel.query.get_or_404(user_id)
+    saved_trades = TradeModel.query.filter_by(user_id=user_id).all()
+    trades = get_saved_trades(saved_trades)
+
+    return render_template('profile.html', user=user, trades=trades)
 
 
 @app.route('/users/<int:user_id>/delete')

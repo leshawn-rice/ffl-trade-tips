@@ -145,5 +145,5 @@ class LeagueHandler:
             league = League(league_id=league_id, year=year, user_id=user_id)
             return True
         else:
-            flash('Invalid League ID and/or year!')
+            flash('Invalid League ID and/or year!', 'danger')
             return False

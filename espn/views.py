@@ -1,4 +1,4 @@
-from flask import render_template, redirect, session, request, jsonify
+from flask import render_template, redirect, session, request, jsonify, flash
 from app.app import app
 from app.database import db
 from espn.settings import POSITIONS, GRADE_MAP
@@ -9,6 +9,12 @@ from user.models import UserModel
 from app.forms import AddLeagueForm, SelectTeamForm, SimulateTradeForm
 
 league_handler = LeagueHandler()
+
+
+def delete_league(league_id):
+    league = LeagueModel.query.get_or_404(league_id)
+    delete_from_db(league)
+    flash('League Deleted Successfuly', 'success')
 
 
 def get_trade_suggestions(player):
@@ -121,6 +127,19 @@ def show_leagues():
     return render_template('all_leagues.html', leagues=leagues)
 
 
+@app.route('/leagues/<int:league_id>')
+def league_page(league_id):
+    '''Displays information about the league with id league_id'''
+    if 'user_id' not in session:
+        return redirect('/login')
+    league = LeagueModel.query.get(league_id)
+    if league.user_id == session.get('user_id'):
+        user_team = TeamModel.query.get_or_404(league.user_team)
+        return render_template('league.html', league=league, user_team=user_team)
+
+    return redirect('/leagues')
+
+
 @app.route('/leagues/<int:league_id>/select-team', methods=['GET', 'POST'])
 def select_team(league_id):
     '''Allows User to select their team from list of teams'''
@@ -143,17 +162,33 @@ def select_team(league_id):
     return redirect('/')
 
 
-@app.route('/leagues/<int:league_id>')
-def league_page(league_id):
-    '''Displays information about the league with id league_id'''
-    if 'user_id' not in session:
-        return redirect('/login')
-    league = LeagueModel.query.get_or_404(league_id)
-    if league.user_id == session.get('user_id'):
-        user_team = TeamModel.query.get_or_404(league.user_team)
-        return render_template('league.html', league=league, user_team=user_team)
+@app.route('/leagues/<int:league_id>/trade-sim', methods=['POST'])
+def show_trade_sim(league_id):
+    form = SimulateTradeForm()
+    if form.validate_on_submit:
+        new_team = league_handler.simulate_trade(form)
+        if new_team:
+            return render_template('trade_sim.html', team=new_team)
+        else:
+            flash('There was an error in simulating your trade!', 'danger')
+            return redirect(f'/leagues/{league_id}')
 
-    return redirect('/leagues')
+
+@app.route('/users/<int:league_id>/delete')
+def delete_league(league_id):
+    '''
+    Deletes the league with id league_id from
+    the database, if authentication succeeds.
+    Otherwise returns home
+    '''
+    league = LeagueModel.query.get_or_404(league_id)
+    if 'user_id' not in session:
+        flash('You need to be logged in to do that!', 'danger')
+    elif league.user_id == session.get('user_id'):
+        delete_league(league_id)
+    else:
+        flash('You cannot delete an account that isn\'t yours!', 'danger')
+    return redirect('/')
 
 
 @app.route('/teams/<int:team_id>')
@@ -210,11 +245,3 @@ def get_player_outlooks(player_id):
         }
         outlooks.append(outlook_dict)
     return (jsonify(outlooks=outlooks), 200)
-
-
-@app.route('/leagues/<int:league_id>/trade-sim', methods=['POST'])
-def show_trade_sim(league_id):
-    form = SimulateTradeForm()
-    if form.validate_on_submit:
-        new_team = league_handler.simulate_trade(form)
-        return render_template('trade_sim.html', team=new_team)

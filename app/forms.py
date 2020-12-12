@@ -50,7 +50,7 @@ class AddLeagueForm(FlaskForm):
     league_id = IntegerField('League ID', validators=[
                              InputRequired(message='You must enter a League ID!')])
     year = IntegerField('Year', validators=[InputRequired(
-        message='You must enter a year!'), NumberRange(min=2000, max=2021)])
+        message='You must enter a year!'), NumberRange(min=2000, max=2024)])
 
 
 class ContactForm(FlaskForm):
@@ -61,7 +61,6 @@ class ContactForm(FlaskForm):
     Validation:
                 All inputs required, email must be a valid email, message cannot be blank
     '''
-    # Add validation for username length (no more than 20 per db)
     email = StringField('Email', validators=[InputRequired(
         message='Email cannot be blank!'), Email(message='Invalid Email!')])
     message = TextAreaField('Message', validators=[
@@ -76,12 +75,12 @@ class SelectTeamForm(FlaskForm):
     Validation:
                 All inputs required, email must be a valid email, message cannot be blank
     '''
-    # Add validation for username length (no more than 20 per db)
     team = SelectField('Teams', validators=[
                        InputRequired(message='Team cannot be empty!')])
 
 
 class SimulateTradeForm(FlaskForm):
+    # All these are needed for trade simulation
     player_qb = SelectField('Player QB')
     player_rb = SelectField('Player RB')
     player_wr = SelectField('Player WR')
