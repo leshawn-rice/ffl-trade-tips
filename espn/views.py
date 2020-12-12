@@ -191,7 +191,7 @@ def player_page(player_id):
     return redirect(f'/teams/{player.team.id}')
 
 
-@ app.route('/players/<int:player_id>/stats-data')
+@app.route('/players/<int:player_id>/stats-data')
 def get_player_stats(player_id):
     player = PlayerModel.query.get_or_404(player_id)
     stats = []
@@ -203,7 +203,7 @@ def get_player_stats(player_id):
     return (jsonify(stats=stats), 200)
 
 
-@ app.route('/players/<int:player_id>/outlooks-data')
+@app.route('/players/<int:player_id>/outlooks-data')
 def get_player_outlooks(player_id):
     player = PlayerModel.query.get_or_404(player_id)
     outlooks = []
