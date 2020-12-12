@@ -1,67 +1,104 @@
-{% extends 'html_base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block navbar %}
-<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-start p-0">
-    <p class="navbar-brand d-flex align-self-center font-weight-bold m-0 p-0">Fantasy Football Trade Tips</p>
-    {% if 'user_id' in session %}
-    <a class="nav-link ml-auto text-light" id="profile-phone" href="/profile"><i class="fas fa-user"
-            data-toggle="tooltip" data-placement="bottom" title="Profile"></i></a>
-    <a class="nav-link ml-auto text-light" id="settings-phone" href="/sign-out"><i class="fas fa-sign-out-alt"
-            data-toggle="tooltip" data-placement="bottom" title="Sign Out"></i></a>
-    {% endif %}
-    <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbar-toggler"
-        aria-controls="navbar-toggler" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbar-toggler">
-        <ul class="navbar-nav ml-4 mt-lg-0" id="navbar-left-items">
-            <li class="nav-item {% block home_active %}{% endblock %} text-center">
-                <a class="nav-link" href="/">Home</a>
-            </li>
-            {% if 'user_id' in session %}
-            <li class="nav-item {% block leagues_active %}{% endblock %} text-center">
-                <a class="nav-link" href="/leagues">My Leagues</a>
-            </li>
-            <li class="nav-item {% block news_active %}{% endblock %} text-center">
-                <a class="nav-link" href="/recent-news">Recent News</a>
-            </li>
-        </ul>
-        <ul class="navbar-nav ml-auto mt-lg-0" id="navbar-right-items">
-            <li class="nav-item" id="profile-desktop">
-                <a class="nav-link" href="/profile"><i class="fas fa-user" data-toggle="tooltip" data-placement="bottom"
-                        title="Profile"></i></a>
-            </li>
-            <li class="nav-item" id="settings-desktop">
-                <a class="nav-link" href="/sign-out" data-toggle="tooltip" data-placement="bottom" title="Sign Out"><i
-                        class="fas fa-sign-out-alt"></i></a>
-            </li>
-            {% else %}
-            <li class="nav-item {% block log_sign_active %}{% endblock %} text-center">
-                <a class="nav-link" href="/login">Login/Sign Up</a>
-            </li>
-            {% endif %}
-        </ul>
-    </div>
-</nav>
-{% endblock %}
-{% block footer %}
-<br><br><br><br>
-<footer class="footer bg-dark">
-    <div class="row">
-        <div class="col-4">
-            <p class="h6 ml-3 text-light">Leshawn Rice 2020</p>
-        </div>
-        <div class="col-8 footer-links">
-            <a href="https://github.com/leshawn-rice" target="_blank" class="text-light" data-toggle="tooltip"
-                data-placement="top" title="Github"><i class="fab fa-github"></i></a>
-            <a href="https://linkedin.com/in/leshawn-rice" target="_blank" class="text-primary" data-toggle="tooltip"
-                data-placement="top" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
-            <a href="/contact" class="text-light" data-toggle="tooltip" data-placement="top" title="Contact Us"><i
-                    class="fas fa-inbox"></i></a>
-            <a href="/about" class="text-light" data-toggle="tooltip" data-placement="top" title="About"><i
-                    class="fas fa-users"></i></a>
-        </div>
-    </div>
-</footer>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+        integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+        integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+        crossorigin="anonymous" />
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <title>Fantasy Trade Tips - {% block title %}{% endblock %}</title>
+</head>
 
-{% endblock %}
+<body class="bg-dark text-light">
+
+    {% block navbar %}
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark justify-content-start p-0">
+        <p class="navbar-brand d-flex align-self-center font-weight-bold m-0 p-0">Fantasy Football Trade Tips</p>
+        <!-- If the user is logged in show the profile and sign out buttons on phone -->
+        {% if 'user_id' in session %}
+        <a class="nav-link ml-auto text-light" id="profile-phone" href="/profile"><i class="fas fa-user"
+                data-toggle="tooltip" data-placement="bottom" title="Profile"></i></a>
+        <a class="nav-link ml-auto text-light" id="settings-phone" href="/sign-out"><i class="fas fa-sign-out-alt"
+                data-toggle="tooltip" data-placement="bottom" title="Sign Out"></i></a>
+        {% endif %}
+        <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbar-toggler"
+            aria-controls="navbar-toggler" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar-toggler">
+            <ul class="navbar-nav ml-4 mt-lg-0" id="navbar-left-items">
+                <li class="nav-item {% block home_active %}{% endblock %} text-center">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <!-- If the user is logged in show my leagues and my recent news & profile/sign-out on desktop -->
+                {% if 'user_id' in session %}
+                <li class="nav-item {% block leagues_active %}{% endblock %} text-center">
+                    <a class="nav-link" href="/leagues">My Leagues</a>
+                </li>
+                <li class="nav-item {% block news_active %}{% endblock %} text-center">
+                    <a class="nav-link" href="/recent-news">Recent News</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto mt-lg-0" id="navbar-right-items">
+                <li class="nav-item" id="profile-desktop">
+                    <a class="nav-link" href="/profile"><i class="fas fa-user" data-toggle="tooltip"
+                            data-placement="bottom" title="Profile"></i></a>
+                </li>
+                <li class="nav-item" id="settings-desktop">
+                    <a class="nav-link" href="/sign-out" data-toggle="tooltip" data-placement="bottom"
+                        title="Sign Out"><i class="fas fa-sign-out-alt"></i></a>
+                </li>
+                {% else %}
+                <li class="nav-item {% block log_sign_active %}{% endblock %} text-center">
+                    <a class="nav-link" href="/login">Login/Sign Up</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    {% endblock %}
+
+    <div class="container-fluid">
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block footer %}
+    <br><br><br><br>
+    <footer class="footer bg-dark">
+        <div class="row">
+            <div class="col-4">
+                <p class="h6 ml-3 text-light">Leshawn Rice 2020</p>
+            </div>
+            <div class="col-8 footer-links">
+                <a href="https://github.com/leshawn-rice" target="_blank" class="text-light" data-toggle="tooltip"
+                    data-placement="top" title="Github"><i class="fab fa-github"></i></a>
+                <a href="https://linkedin.com/in/leshawn-rice" target="_blank" class="text-primary"
+                    data-toggle="tooltip" data-placement="top" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="/contact" class="text-light" data-toggle="tooltip" data-placement="top" title="Contact Us"><i
+                        class="fas fa-inbox"></i></a>
+                <a href="/about" class="text-light" data-toggle="tooltip" data-placement="top" title="About"><i
+                        class="fas fa-users"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    {% endblock %}
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+
+</html>

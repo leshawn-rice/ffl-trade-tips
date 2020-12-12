@@ -3,10 +3,10 @@ from espn.classes.base_classes import ESPNBase
 from espn.classes.grade_class import GradeCalculator
 from espn.classes.model_handler_classes import LeagueModelHandler, TeamModelHandler, PlayerModelHandler
 from espn.models import LeagueModel, TeamModel, TeamStatModel, PlayerModel, PlayerStatModel
-from espn.settings import PRO_TEAM_MAP, STATS_MAP, POSITION_MAP, STANDARD_SEASON_LENGTH, DEFAULT_STAT_VALUES, GRADE_TO_VALUE, VALUE_TO_GRADE
+from espn.settings import PRO_TEAM_MAP, STATS_MAP, POSITION_MAP, DEFAULT_STAT_VALUES, GRADE_TO_VALUE, VALUE_TO_GRADE
 
 
-class Settings:
+class LeagueSettings:
     '''Class for ESPN League Settings'''
 
     def __init__(self, data):
@@ -15,25 +15,26 @@ class Settings:
         scoring settings
         '''
         self.scoring_settings = {}
-        self.current_week = data['scoringPeriodId']
-        self.get_league_settings(data)
-        self.get_scoring_settings(data)
+        self.data = data
+        self.current_week = self.data['scoringPeriodId']
+        self.get_league_settings()
+        self.get_scoring_settings()
 
-    def get_league_settings(self, data):
+    def get_league_settings(self):
         '''
         Get total number of weeks and
         whether the league is active
         '''
-        self.is_active = data['status']['isActive']
-        self.total_weeks = data['status']['finalScoringPeriod']
+        self.is_active = self.data['status']['isActive']
+        self.total_weeks = self.data['status']['finalScoringPeriod']
 
-    def get_scoring_settings(self, data):
+    def get_scoring_settings(self):
         '''
         Get scoring settings from
         the API. This gets point
         values for each stat
         '''
-        scoring_settings = data['settings']['scoringSettings']
+        scoring_settings = self.data['settings']['scoringSettings']
         scoring_items = scoring_settings['scoringItems']
         for stat in scoring_items:
             if stat['statId'] in STATS_MAP:
@@ -60,6 +61,12 @@ class League(ESPNBase):
                             'year': self.year, 'cookies': self.cookies, 'user_id': self.user_id}
         self.create_league()
 
+    def get_data(self):
+        super().__init__()
+        views = ['mTeam', 'mRoster', 'mSettings', 'kona_playercard']
+        params = {'view': views}
+        self.data = self.make_espn_request(params)
+
     def get_settings(self):
         '''
         Gets JSON league settings from
@@ -67,9 +74,7 @@ class League(ESPNBase):
         the Settings class and assigns it
         to the settings attribute
         '''
-        params = {'view': 'mSettings'}
-        data = self.make_espn_request(params)
-        self.settings = Settings(data)
+        self.settings = LeagueSettings(self.data)
         self.league_info['current_week'] = self.settings.current_week
         self.league_info['total_weeks'] = self.settings.total_weeks
 
@@ -88,10 +93,8 @@ class League(ESPNBase):
         and the current week from the
         API
         '''
-        super().__init__()
-        data = self.make_espn_request()
-        name = data['settings']['name']
-        self.week = data['scoringPeriodId']
+        name = self.data['settings']['name']
+        self.week = self.data['scoringPeriodId']
         return name
 
     def get_num_teams(self):
@@ -101,11 +104,7 @@ class League(ESPNBase):
         '''
         self.num_teams = 0
 
-        views = ['mTeam']
-        params = {'view': views}
-        data = self.make_espn_request(params)
-
-        for team in data['teams']:
+        for team in self.data['teams']:
             self.num_teams += 1
 
     def get_teams(self):
@@ -115,11 +114,7 @@ class League(ESPNBase):
         the response, adding instances
         of the Team class to the teams attribute
         '''
-        views = ['mTeam']
-        params = {'view': views}
-        data = self.make_espn_request(params)
-
-        for team in data['teams']:
+        for team in self.data['teams']:
             new_team = Team(data=team, league_info=self.league_info)
             self.teams.add(new_team)
 
@@ -177,6 +172,7 @@ class League(ESPNBase):
         '''
         Calls functions needed to
         create the league'''
+        self.get_data()
         self.get_basic_info()
         self.get_settings()
         self.get_num_teams()
@@ -194,31 +190,32 @@ class Team(ESPNBase):
         the roster attribute to an empty set
         '''
         self.league_info = league_info
+        self.data = data
         self.user_id = league_info.get('user_id')
         self.roster = set()
-        self.create_team(data)
+        self.create_team()
 
-    def get_basic_info(self, data):
+    def get_basic_info(self):
         '''
         Gets all basic team info
         '''
-        self.id = data['id']
+        self.id = self.data['id']
         self.league_id = self.league_info.get('league_model_id')
-        self.accronym = data['abbrev']
-        self.location = data['location']
-        self.nickname = data['nickname']
-        self.logo_url = data['logo']
-        self.points = data['points']
+        self.accronym = self.data['abbrev']
+        self.location = self.data['location']
+        self.nickname = self.data['nickname']
+        self.logo_url = self.data['logo']
+        self.points = self.data['points']
         self.points = round(self.points, 2)
-        wins = data['record']['overall']['wins']
-        losses = data['record']['overall']['losses']
+        wins = self.data['record']['overall']['wins']
+        losses = self.data['record']['overall']['losses']
         self.record = f'{wins}-{losses}'
-        self.waiver_position = data['waiverRank']
+        self.waiver_position = self.data['waiverRank']
 
-    def get_stats(self, data):
+    def get_stats(self):
         '''Gets the stats for the team'''
         self.stats = {}
-        self.add_stats(data['valuesByStat'])
+        self.add_stats(self.data['valuesByStat'])
 
     def create_player(self, player):
         '''
@@ -226,11 +223,12 @@ class Team(ESPNBase):
         given the JSON for the player from the API, 
         then adds them to the roster attribute
         '''
+        ranking = player['playerPoolEntry']['ratings']['0']['positionalRanking'] if 'playerPoolEntry' in player else 0
         player_data = player['playerPoolEntry']['player'] if 'playerPoolEntry' in player else player['player']
         team_id = TeamModel.query.filter_by(
             team_id=self.id, league_id=self.league_id, user_id=self.user_id).first().id
         new_player = Player(
-            data=player_data, league_info=self.league_info, team_id=team_id)
+            data=player_data, league_info=self.league_info, team_id=team_id, ranking=ranking)
         self.roster.add(new_player)
 
     def get_roster(self):
@@ -240,12 +238,7 @@ class Team(ESPNBase):
         an instance of the player class for
         each players
         '''
-        views = ['mRoster']
-        params = {'view': views, 'forTeamId': self.id}
-        super().__init__()
-        data = self.make_espn_request(params)
-        roster_data = data['teams'][0]
-        for player in roster_data['roster']['entries']:
+        for player in self.data['roster']['entries']:
             self.create_player(player)
 
     def handle_db(self):
@@ -253,10 +246,10 @@ class Team(ESPNBase):
         db_handler = TeamModelHandler(self)
         db_handler.add_or_update_record()
 
-    def create_team(self, data):
+    def create_team(self):
         '''Drives necessary functions for adding a team'''
-        self.get_basic_info(data)
-        self.get_stats(data)
+        self.get_basic_info()
+        self.get_stats()
         self.handle_db()
         self.get_roster()
 
@@ -264,7 +257,7 @@ class Team(ESPNBase):
 class Player(ESPNBase):
     '''ESPN API Wrapper for Players'''
 
-    def __init__(self, data, league_info, team_id):
+    def __init__(self, data, league_info, team_id, ranking):
         '''
         Gets basic player info and calls driving
         function
@@ -273,51 +266,35 @@ class Player(ESPNBase):
         self.team_id = team_id
         self.league_id = league_info.get('league_model_id')
         self.league_info['team_id'] = team_id
-        self.create_player(data)
+        self.data = data
+        self.rank = ranking
+        self.create_player()
 
-    def get_rank(self):
-        '''
-        Gets the player position
-        rank data from the api and
-        sets it to the rank attribute
-        '''
-        super().__init__()
-        views = ['mRoster']
-        params = {'view': views}
-        data = self.make_espn_request(params)
-        for team in data['teams']:
-            for player in team['roster']['entries']:
-                player_data = player['playerPoolEntry']
-                if player_data['id'] == self.id:
-                    return player_data['ratings']['0']['positionalRanking']
-        return 0
-
-    def get_basic_info(self, data):
+    def get_basic_info(self):
         '''
         Gets all basic info for the player
         from the API and sets it into attributes
         on the instance
         '''
-        self.id = data['id']
-        self.position = POSITION_MAP[data['defaultPositionId']]
-        self.first_name = data['firstName']
-        self.last_name = data['lastName']
+        self.id = self.data['id']
+        self.position = POSITION_MAP[self.data['defaultPositionId']]
+        self.first_name = self.data['firstName']
+        self.last_name = self.data['lastName']
         self.outlooks = []
-        if 'outlooks' in data:
-            for week, outlook in data['outlooks']['outlooksByWeek'].items():
+        if 'outlooks' in self.data:
+            for week, outlook in self.data['outlooks']['outlooksByWeek'].items():
                 int_week = int(week)
                 self.outlooks.append((int_week, outlook))
         else:
             self.outlooks = []
 
-        self.rank = self.get_rank()
-        self.injured = data.get('injured', False)
-        self.injury_status = data.get('injuryStatus', 'ACTIVE')
-        self.pro_team = PRO_TEAM_MAP[data.get('proTeamId')]
+        self.injured = self.data.get('injured', False)
+        self.injury_status = self.data.get('injuryStatus', 'ACTIVE')
+        self.pro_team = PRO_TEAM_MAP[self.data.get('proTeamId')]
         if self.pro_team == 'None':
             self.pro_team = 'FA'
 
-    def get_stat_data(self, data):
+    def get_stat_data(self):
         '''
         Gets stat data for the player
         from the API and adds it to the
@@ -326,7 +303,7 @@ class Player(ESPNBase):
         year = self.league_info['year']
         year_id = f'00{year}'
 
-        stat_block = [x for x in data['stats'] if x['id'] == year_id][0]
+        stat_block = [x for x in self.data['stats'] if x['id'] == year_id][0]
         self.points = stat_block['appliedTotal']
         self.points = round(self.points, 2)
         self.point_avg = stat_block['appliedAverage']
@@ -338,14 +315,14 @@ class Player(ESPNBase):
             'appliedStats') else stat_block['stats']
         return stats_to_check
 
-    def get_stats(self, data):
+    def get_stats(self):
         '''
         Initializes the stats attribute to an empty
         dictionary, gets all stat data from the api,
         then adds the stats to the dictionary
         '''
         self.stats = {}
-        stat_data = self.get_stat_data(data)
+        stat_data = self.get_stat_data()
         self.add_stats(stat_data)
 
     def handle_db(self):
@@ -353,8 +330,8 @@ class Player(ESPNBase):
         db_handler = PlayerModelHandler(self)
         db_handler.add_or_update_record()
 
-    def create_player(self, data):
+    def create_player(self):
         '''Drives player creation'''
-        self.get_basic_info(data)
-        self.get_stats(data)
+        self.get_basic_info()
+        self.get_stats()
         self.handle_db()

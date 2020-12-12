@@ -1,8 +1,6 @@
 from app.database import db
 from espn.settings import GRADE_MAP
 
-# kjadh = 3
-
 
 class LeagueModel(db.Model):
     '''

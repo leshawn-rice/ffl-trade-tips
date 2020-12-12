@@ -1,5 +1,3 @@
-STANDARD_SEASON_LENGTH = 13
-
 POSITION_MAP = {
     0: 'QB', 1: 'QB', 2: 'RB', 3: 'WR', 4: 'TE', 5: 'K',
     6: 'TE', 7: 'OP', 8: 'DT', 9: 'DE', 10: 'LB', 11: 'DL',

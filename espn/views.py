@@ -32,7 +32,12 @@ def get_trade_suggestions(player):
         return ['NO PLAYERS FOUND']
 
 
-def add_form_choices(player, form):
+def set_trade_sim_choices(player, form):
+    '''
+    Gets the players in each position on the current
+    players team and not on their team, and puts them
+    in a list of choices for their respective category
+    '''
     form.player_qb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
         PlayerModel.position == 'QB', PlayerModel.team_id == player.team_id)]
     form.player_qb.choices.insert(0, (None, 'NONE'))
@@ -173,13 +178,13 @@ def player_page(player_id):
     league = player.league
     if league.user_id == session.get('user_id'):
         form = SimulateTradeForm()
-        add_form_choices(player, form)
+        set_trade_sim_choices(player, form)
+        if form.validate_on_submit():
+            # Simulate Trade
+            return redirect('/')
+            # redirect to trade simulation page
         if request.method == 'POST':
             trade_suggestions = get_trade_suggestions(player)
-            if form.validate_on_submit():
-                # Simulate Trade
-                return redirect('/')
-                # redirect to trade simulation page
             return render_template('player.html', player=player, trade_suggestions=trade_suggestions, form=form)
         else:
             return render_template('player.html', player=player, form=form)
