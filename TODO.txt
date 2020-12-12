@@ -1,5 +1,0 @@
-6. Add trade simulation.
-7. Generate team/player stats on different page loads, to decrease the amount of time it takes to get all your league data.
-8. Add docs
-9. Add tests.
-10. Deploy
