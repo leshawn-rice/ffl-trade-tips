@@ -9,13 +9,13 @@ from espn.models import PlayerModel
 authentication = UserAuthentication()
 
 
-def do_delete_user(user_id):
-    user = UserModel.query.get_or_404(user_id)
-    delete_from_db(user)
-    flash('Account Deleted Successfuly', 'success')
-
-
 def create_saved_trade_data(user_id):
+    '''
+    Gets the saved trade data passed by 
+    the 'addSaveTradeListener' function
+    in app.js, and creates a new row in the
+    trademodel table with the data.
+    '''
     data = request.json
     current_player_id = data['trading_player_id']
     trading_player_ids = data['player_ids']
@@ -24,23 +24,29 @@ def create_saved_trade_data(user_id):
         return False
     if num_trades == 1:
         new_trade = TradeModel(
-            user_id=user_id, player_to_trade=current_player_id, first_player=trading_player_ids[0])
+            user_id=user_id, player_to_trade_id=current_player_id, first_player_id=trading_player_ids[0])
     if num_trades == 2:
         new_trade = TradeModel(
-            user_id=user_id, player_to_trade=current_player_id, first_player=trading_player_ids[0], second_player=trading_player_ids[1])
+            user_id=user_id, player_to_trade_id=current_player_id, first_player_id=trading_player_ids[0], second_player_id=trading_player_ids[1])
     if num_trades == 3:
         new_trade = TradeModel(
-            user_id=user_id, player_to_trade=current_player_id, first_player=trading_player_ids[0], second_player=trading_player_ids[1], third_player=trading_player_ids[2])
+            user_id=user_id, player_to_trade_id=current_player_id, first_player_id=trading_player_ids[0], second_player_id=trading_player_ids[1], third_player_id=trading_player_ids[2])
     return new_trade
 
 
 def get_saved_trades(saved_trades):
+    '''
+    Gets the players with the ids in 
+    saved_trades, and adds them to a list
+    of dictionaries, each with info about
+    a single trade
+    '''
     trades = []
     for trade_data in saved_trades:
-        current_player = PlayerModel.query.get(trade_data.player_to_trade)
-        first_player = PlayerModel.query.get(trade_data.first_player)
-        second_player = PlayerModel.query.get(trade_data.second_player)
-        third_player = PlayerModel.query.get(trade_data.third_player)
+        current_player = PlayerModel.query.get(trade_data.player_to_trade_id)
+        first_player = PlayerModel.query.get(trade_data.first_player_id)
+        second_player = PlayerModel.query.get(trade_data.second_player_id)
+        third_player = PlayerModel.query.get(trade_data.third_player_id)
         trade = {
             'Current Player': current_player,
             'First Player': first_player,
@@ -138,7 +144,7 @@ def delete_user(user_id):
     if 'user_id' not in session:
         flash('You need to be logged in to do that!', 'danger')
     elif user_id == session.get('user_id'):
-        do_delete_user(user_id)
+        authentication.delete(user_id)
         return redirect('/sign-out')
     else:
         flash('You cannot delete an account that isn\'t yours!', 'danger')

@@ -2,6 +2,7 @@ from flask import render_template, flash, redirect
 from flask_mail import Mail, Message
 from app.secrets import email_username
 from app.app import app
+from app.database import refresh_tables
 from app.forms import ContactForm
 import user.views
 import espn.views

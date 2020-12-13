@@ -33,12 +33,12 @@ class TradeModel(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey(
         'users.id', ondelete='cascade'))
-    player_to_trade = db.Column(db.Integer, db.ForeignKey(
+    player_to_trade_id = db.Column(db.Integer, db.ForeignKey(
         'players.id', ondelete='cascade'))
 
-    first_player = db.Column(db.Integer, db.ForeignKey(
+    first_player_id = db.Column(db.Integer, db.ForeignKey(
         'players.id', ondelete='cascade'))
-    second_player = db.Column(db.Integer, db.ForeignKey(
+    second_player_id = db.Column(db.Integer, db.ForeignKey(
         'players.id', ondelete='cascade'))
-    third_player = db.Column(db.Integer, db.ForeignKey(
+    third_player_id = db.Column(db.Integer, db.ForeignKey(
         'players.id', ondelete='cascade'))

@@ -29,9 +29,9 @@ class LeagueModel(db.Model):
     user_team = db.Column(db.Integer)
 
     players = db.relationship(
-        'PlayerModel', backref='league')
+        'PlayerModel', backref='league', cascade='all, delete')
     teams = db.relationship(
-        'TeamModel', backref='league')
+        'TeamModel', backref='league', cascade='all, delete')
 
     def __repr__(self):
         return f'<LeagueModel id={self.id} league_id={self.league_id} year={self.year} user_id={self.user_id}>'
@@ -144,8 +144,9 @@ class PlayerModel(db.Model):
     grade = db.Column(db.Text)
 
     stats = db.relationship(
-        'PlayerStatModel', backref='player')
-    outlooks = db.relationship('PlayerOutlookModel', backref='player')
+        'PlayerStatModel', backref='player', cascade='all, delete')
+    outlooks = db.relationship(
+        'PlayerOutlookModel', backref='player', cascade='all, delete')
 
     def __repr__(self):
         return f'<PlayerModel id={self.id} team_id={self.team_id} league_id={self.league_id} name={self.full_name} grade={self.grade}>'

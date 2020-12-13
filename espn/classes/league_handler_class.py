@@ -1,5 +1,7 @@
 from flask import session, flash, request
-from espn.models import PlayerModel, TeamModel
+from app.database import delete_from_db
+from espn.settings import GRADE_MAP
+from espn.models import PlayerModel, TeamModel, LeagueModel
 from espn.classes.base_classes import ESPNRequest
 from espn.classes.espn_classes import League
 
@@ -46,7 +48,7 @@ class LeagueHandler:
     form
     '''
 
-    def get_players(self, form):
+    def get_sim_players(self, form):
         '''
         Gets the player_ids from
         the form data, and returns a list
@@ -128,7 +130,7 @@ class LeagueHandler:
         are receiving, returns the fake team
         or False if the trade sim cannot be done
         '''
-        [user_players, other_players] = self.get_players(form)
+        [user_players, other_players] = self.get_sim_players(form)
 
         user_player_models = []
         other_player_models = []
@@ -156,6 +158,25 @@ class LeagueHandler:
                     if user_player.position == other_player.position:
                         fake_team.switch_players(user_player, other_player)
             return fake_team
+
+    def get_trade_suggestions(self, user_id, player):
+        '''
+        Gets players with grades 1 below and above the current
+        player's with the same position, and returns a list of them.
+        '''
+        player_grade = request.form.get('player_grade')
+        trade_suggestions = []
+        if player_grade:
+            acceptable_grades = GRADE_MAP[player_grade]
+            teams = TeamModel.query.filter_by(user_id=user_id)
+            for team in teams:
+                for p in team.players:
+                    if p.grade in (acceptable_grades) and p.position == player.position and p.id != player.id and p.points >= player.points:
+                        trade_suggestions.append(p)
+        if trade_suggestions:
+            return trade_suggestions[:3]
+        else:
+            return ['NO PLAYERS FOUND']
 
     def get_league_data(self, form):
         '''
@@ -191,3 +212,55 @@ class LeagueHandler:
         else:
             flash('Invalid League ID and/or year!', 'danger')
             return False
+
+    def delete(self, league_id):
+        '''Deletes the league from the db'''
+        league = LeagueModel.query.get_or_404(league_id)
+        delete_from_db(league)
+        flash('League Deleted Successfuly', 'success')
+
+    def set_trade_sim_choices(self, player, form):
+        '''
+        Gets the players in each position on the current
+        players team and not on their team, and puts them
+        in a list of choices for their respective category
+        '''
+
+        # Ideally this would be in a loop, but I'm not quite sure how to do that
+        form.player_qb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'QB', PlayerModel.team_id == player.team_id)]
+        form.player_qb.choices.insert(0, (None, 'NONE'))
+        form.player_rb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'RB', PlayerModel.team_id == player.team_id)]
+        form.player_rb.choices.insert(0, (None, 'NONE'))
+        form.player_wr.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'WR', PlayerModel.team_id == player.team_id)]
+        form.player_wr.choices.insert(0, (None, 'NONE'))
+        form.player_te.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'TE', PlayerModel.team_id == player.team_id)]
+        form.player_te.choices.insert(0, (None, 'NONE'))
+        form.player_k.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'K', PlayerModel.team_id == player.team_id)]
+        form.player_k.choices.insert(0, (None, 'NONE'))
+        form.player_dst.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'D/ST', PlayerModel.team_id == player.team_id)]
+        form.player_dst.choices.insert(0, (None, 'NONE'))
+
+        form.other_qb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'QB', PlayerModel.team_id != player.team_id)]
+        form.other_qb.choices.insert(0, (None, 'NONE'))
+        form.other_rb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'RB', PlayerModel.team_id != player.team_id)]
+        form.other_rb.choices.insert(0, (None, 'NONE'))
+        form.other_wr.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'WR', PlayerModel.team_id != player.team_id)]
+        form.other_wr.choices.insert(0, (None, 'NONE'))
+        form.other_te.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'TE', PlayerModel.team_id != player.team_id)]
+        form.other_te.choices.insert(0, (None, 'NONE'))
+        form.other_k.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'K', PlayerModel.team_id != player.team_id)]
+        form.other_k.choices.insert(0, (None, 'NONE'))
+        form.other_dst.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
+            PlayerModel.position == 'D/ST', PlayerModel.team_id != player.team_id)]
+        form.other_dst.choices.insert(0, (None, 'NONE'))

@@ -11,81 +11,6 @@ from app.forms import AddLeagueForm, SelectTeamForm, SimulateTradeForm
 league_handler = LeagueHandler()
 
 
-def do_delete_league(league_id):
-    '''Deletes the league from the db'''
-    league = LeagueModel.query.get_or_404(league_id)
-    delete_from_db(league)
-    flash('League Deleted Successfuly', 'success')
-
-
-def get_trade_suggestions(player):
-    '''
-    Gets players with grades 1 below and above the current
-    player's with the same position, and returns a list of them.
-    '''
-    user_id = session.get('user_id')
-    player_grade = request.form.get('player_grade')
-    trade_suggestions = []
-    if player_grade:
-        acceptable_grades = GRADE_MAP[player_grade]
-        teams = TeamModel.query.filter_by(user_id=user_id)
-        for team in teams:
-            for p in team.players:
-                if p.grade in (acceptable_grades) and p.position == player.position and p.id != player.id and p.points >= player.points:
-                    trade_suggestions.append(p)
-    if trade_suggestions:
-        return trade_suggestions[:3]
-    else:
-        return ['NO PLAYERS FOUND']
-
-
-def set_trade_sim_choices(player, form):
-    '''
-    Gets the players in each position on the current
-    players team and not on their team, and puts them
-    in a list of choices for their respective category
-    '''
-
-    # Ideally this would be in a loop, but I'm not quite sure how to do that
-    form.player_qb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'QB', PlayerModel.team_id == player.team_id)]
-    form.player_qb.choices.insert(0, (None, 'NONE'))
-    form.player_rb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'RB', PlayerModel.team_id == player.team_id)]
-    form.player_rb.choices.insert(0, (None, 'NONE'))
-    form.player_wr.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'WR', PlayerModel.team_id == player.team_id)]
-    form.player_wr.choices.insert(0, (None, 'NONE'))
-    form.player_te.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'TE', PlayerModel.team_id == player.team_id)]
-    form.player_te.choices.insert(0, (None, 'NONE'))
-    form.player_k.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'K', PlayerModel.team_id == player.team_id)]
-    form.player_k.choices.insert(0, (None, 'NONE'))
-    form.player_dst.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'D/ST', PlayerModel.team_id == player.team_id)]
-    form.player_dst.choices.insert(0, (None, 'NONE'))
-
-    form.other_qb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'QB', PlayerModel.team_id != player.team_id)]
-    form.other_qb.choices.insert(0, (None, 'NONE'))
-    form.other_rb.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'RB', PlayerModel.team_id != player.team_id)]
-    form.other_rb.choices.insert(0, (None, 'NONE'))
-    form.other_wr.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'WR', PlayerModel.team_id != player.team_id)]
-    form.other_wr.choices.insert(0, (None, 'NONE'))
-    form.other_te.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'TE', PlayerModel.team_id != player.team_id)]
-    form.other_te.choices.insert(0, (None, 'NONE'))
-    form.other_k.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'K', PlayerModel.team_id != player.team_id)]
-    form.other_k.choices.insert(0, (None, 'NONE'))
-    form.other_dst.choices = [(p.id, p.full_name) for p in PlayerModel.query.filter(
-        PlayerModel.position == 'D/ST', PlayerModel.team_id != player.team_id)]
-    form.other_dst.choices.insert(0, (None, 'NONE'))
-
-
 @app.route('/recent-news')
 def show_news():
     '''
@@ -188,7 +113,7 @@ def delete_league(league_id):
     if 'user_id' not in session:
         flash('You need to be logged in to do that!', 'danger')
     elif league.user_id == session.get('user_id'):
-        do_delete_league(league_id)
+        league_handler.delete(league_id)
     else:
         flash('You cannot delete an account that isn\'t yours!', 'danger')
     return redirect('/')
@@ -216,9 +141,10 @@ def player_page(player_id):
     league = player.league
     if league.user_id == session.get('user_id'):
         form = SimulateTradeForm()
-        set_trade_sim_choices(player, form)
+        league_handler.set_trade_sim_choices(player, form)
         if request.form.get('player_grade'):
-            trade_suggestions = get_trade_suggestions(player)
+            trade_suggestions = league_handler.get_trade_suggestions(
+                league.user_id, player)
             return render_template('player.html', player=player, trade_suggestions=trade_suggestions, form=form)
         else:
             return render_template('player.html', player=player, form=form)

@@ -1,6 +1,6 @@
 from flask import flash, session
 from flask_bcrypt import Bcrypt
-from app.database import add_to_db
+from app.database import add_to_db, delete_from_db
 from espn.classes.base_classes import ESPNRequest
 from espn.classes.espn_classes import League
 from user.models import UserModel
@@ -98,6 +98,17 @@ class UserAuthentication:
         session['user_id'] = new_user.id
         return new_user
 
+    def delete(self, user_id):
+        '''
+        Deletes the user with user_id
+        from the database and flashes 
+        a success message
+        404's if the user_id can't be found
+        '''
+        user = UserModel.query.get_or_404(user_id)
+        delete_from_db(user)
+        flash('Account Deleted Successfuly', 'success')
+
     def sign_up(self, form):
         '''
         Drives the logic behind signing up a new user
@@ -129,9 +140,7 @@ class UserAuthentication:
             username.upper() == username.upper()).first()
 
         if user:
-            has_correct_password = self.compare_passwords(
-                user.password, password)
-            if has_correct_password:
+            if self.compare_passwords(user.password, password):
                 session['user_id'] = user.id
                 return True
             else:

@@ -36,7 +36,23 @@ function addDeleteAccountAlert() {
   });
 }
 
-function addLoadingScreen() {
+function addDeleteLeagueAlert() {
+  /*
+  Adds an alert so users dont accidentally delete their
+  league by accident
+  */
+  $btn = $('#delete-league-btn')
+  $btn.click((event) => {
+    event.preventDefault();
+    let isProceeding = confirm('Are you sure you would like to delete this league?')
+    if (isProceeding) {
+      let $leagueId = $('#js-league-id').data('league-id');
+      location = `/leagues/${$leagueId}/delete`
+    }
+  });
+}
+
+function addNewLeagueLoadingScreen() {
   /*
   Adds loading icon to add league
   page after add league button is
@@ -54,7 +70,7 @@ function addLoadingScreen() {
   });
 }
 
-async function addStatsButton($hiddenDiv, $statsBtn) {
+async function addStatsListener($hiddenDiv, $statsBtn) {
   /*
   Adds the event listener to the stats
   button on the player page
@@ -92,7 +108,7 @@ async function addStatsButton($hiddenDiv, $statsBtn) {
   });
 }
 
-async function addOutlooksButton($hiddenDiv, $outlooksBtn) {
+async function addOutlooksListener($hiddenDiv, $outlooksBtn) {
   /*
   Adds the event listener to the outlooks
   button on the player page
@@ -130,7 +146,7 @@ async function addOutlooksButton($hiddenDiv, $outlooksBtn) {
   });
 }
 
-async function addPlayerButtons() {
+async function addPlayerListeners() {
   /*
   Adds event listeners to the stats and
   outlooks buttons on the player page
@@ -138,8 +154,8 @@ async function addPlayerButtons() {
   const $hiddenDiv = $('#player_stats_div');
   const $statsBtn = $('#player_stats_btn');
   const $outlooksBtn = $('#player_outlooks_btn');
-  await addStatsButton($hiddenDiv, $statsBtn);
-  await addOutlooksButton($hiddenDiv, $outlooksBtn);
+  await addStatsListener($hiddenDiv, $statsBtn);
+  await addOutlooksListener($hiddenDiv, $outlooksBtn);
 }
 
 function getPlayerIds(tradeStr) {
@@ -163,7 +179,19 @@ function getPlayerIds(tradeStr) {
   return trades;
 }
 
-async function addSaveTradeBtn() {
+async function saveTrade(tradeStr, userId, tradingPlayerId) {
+  /*
+  Gets an array of player ids from
+  getPlayerIds, and sends them in a post
+  request to /users/<userId>/save-trade
+  Then alerts 'Trade Saved!' to the user
+  */
+  let trades = getPlayerIds(tradeStr);
+  let response = await axios.post(`/users/${userId}/save-trade`, { trading_player_id: tradingPlayerId, player_ids: trades });
+  alert('Trade Saved!');
+}
+
+async function addSaveTradeListener() {
   /*
   Adds event listener to save trade button
   so users can save their trades to profile
@@ -173,25 +201,7 @@ async function addSaveTradeBtn() {
     let tradeStr = $('#js-player-trades').data('trades');
     let userId = $('#js-user-id').data('user-id');
     let tradingPlayerId = $('#js-player-id').data('player-id');
-    let trades = getPlayerIds(tradeStr);
-    let response = await axios.post(`/users/${userId}/save-trade`, { trading_player_id: tradingPlayerId, player_ids: trades });
-    alert('Trade Saved!')
-  });
-}
-
-function addDeleteLeagueAlert() {
-  /*
-  Adds an alert so users dont accidentally delete their
-  league by accident
-  */
-  $btn = $('#delete-league-btn')
-  $btn.click((event) => {
-    event.preventDefault();
-    let isProceeding = confirm('Are you sure you would like to delete this league?')
-    if (isProceeding) {
-      let $leagueId = $('#js-league-id').data('league-id');
-      location = `/leagues/${$leagueId}/delete`
-    }
+    await saveTrade(tradeStr, userId, tradingPlayerId);
   });
 }
 
@@ -205,9 +215,9 @@ async function addPageItems() {
   setAddLeagueBtnLink();
   addDeleteAccountAlert();
   addDeleteLeagueAlert();
-  addLoadingScreen();
-  await addPlayerButtons();
-  await addSaveTradeBtn();
+  addNewLeagueLoadingScreen();
+  await addPlayerListeners();
+  await addSaveTradeListener();
 }
 
 $(async () => {
