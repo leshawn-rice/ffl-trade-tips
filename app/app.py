@@ -1,12 +1,12 @@
 from flask import Flask
 from app.database import connect_db
-from app.secrets import email_username, email_password
+from app.secrets import email_username, email_password, secret_key
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///ffl_trade_tips'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'hz752lasbv82ckjb'
+app.config['SECRET_KEY'] = secret_key
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465

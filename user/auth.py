@@ -10,26 +10,48 @@ bcrypt = Bcrypt()
 
 
 class UserAuthentication:
-    def create_hashed_password(self, password):
+    def create_hashed_password(self, password=None):
         '''
         Creates and returns a hashed version of the
         given password
         '''
+        # If the password is none, return None
+        if not password:
+            return None
+        # If the password is not a str, return None
+        if not isinstance(password, str):
+            return None
+
         hashed_password = bcrypt.generate_password_hash(
             password)
         return hashed_password.decode('utf8')
 
-    def compare_passwords(self, hashed_password, password):
+    def compare_passwords(self, hashed_password=None, password=None):
         '''
         Compares the hashed password to the plain text password,
         returns True if they match, otherwise returns False
         '''
+        if not hashed_password or not password:
+            return False
+
+        if not isinstance(hashed_password, str) or not isinstance(password, str):
+            return False
+
         return bcrypt.check_password_hash(hashed_password, password)
 
-    def verify_password_match(self, password, confirm_password):
+    def verify_new_password_match(self, password=None, confirm_password=None):
         '''
         Verifies the given passwords match each other
         '''
+
+        if not password or not confirm_password:
+            flash('Neither password can be blank!')
+            return False
+
+        if not isinstance(password, str) or not isinstance(confirm_password, str):
+            flash('Invalid password!')
+            return False
+
         if password == confirm_password:
             return True
         else:
@@ -67,7 +89,7 @@ class UserAuthentication:
         '''
         [email, username, password, confirm_password] = user_data
 
-        if self.verify_username_unique(username) and self.verify_email_unique(email) and self.verify_password_match(password, confirm_password):
+        if self.verify_username_unique(username) and self.verify_email_unique(email) and self.verify_new_password_match(password, confirm_password):
             return True
         else:
             return False
