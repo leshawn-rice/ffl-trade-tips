@@ -27,7 +27,6 @@ class HashPasswordTestCase(TestCase):
     def setUp(self):
         self.auth = UserAuthentication()
 
-    # Expected cases
     def test_lowercase(self):
         '''Testing password '''
         hashedpw = self.auth.create_hashed_password('password')
@@ -54,7 +53,6 @@ class HashPasswordTestCase(TestCase):
         hashedpw = self.auth.create_hashed_password('B@k3Ry!*+C@$h')
         self.assertIn('$2b$12$', hashedpw)
 
-    # Edge Cases
     def test_no_args(self):
         '''Testing passing no arguments'''
         hashedpw = self.auth.create_hashed_password()
@@ -80,7 +78,6 @@ class ComparePasswordTestCase(TestCase):
     def setUp(self):
         self.auth = UserAuthentication()
 
-    # Expected cases
     def test_match(self):
         '''Testing password vs hash for password'''
         pw = 'password'
@@ -100,7 +97,6 @@ class ComparePasswordTestCase(TestCase):
         is_match = self.auth.compare_passwords(hashedpw, 'bucket0fEggs')
         self.assertFalse(is_match)
 
-    # Edge Cases
     def test_no_args(self):
         '''Testing passing no arguments'''
         is_match = self.auth.compare_passwords()
@@ -135,7 +131,6 @@ class VerifyNewPasswordTestCase(TestCase):
     def setUp(self):
         self.auth = UserAuthentication()
 
-    # Expected cases
     def test_match(self):
         '''Testing password vs password'''
         with app.test_client() as client:
@@ -166,7 +161,6 @@ class VerifyNewPasswordTestCase(TestCase):
                 password=pw, confirm_password=confirm_pw)
             self.assertFalse(is_match)
 
-    # Edge cases
     def test_no_args(self):
         '''Testing passing no arguments'''
         with app.test_client() as client:
@@ -214,7 +208,6 @@ class VerifyEmailTestCase(TestCase):
     def tearDown(self):
         db.session.rollback()
 
-    # Expected Cases
     def test_match(self):
         '''Testing test@email.com vs test@email.com'''
         with app.test_client() as client:
@@ -239,7 +232,6 @@ class VerifyEmailTestCase(TestCase):
             is_unique = self.auth.verify_email_unique(email=email)
             self.assertTrue(is_unique)
 
-    # Edge cases
     def test_no_args(self):
         '''Testing passing no arguments'''
         with app.test_client() as client:
@@ -278,7 +270,6 @@ class VerifyUsernameTestCase(TestCase):
     def tearDown(self):
         db.session.rollback()
 
-    # Expected Cases
     def test_match(self):
         '''Testing testuser vs testuser'''
         with app.test_client() as client:
@@ -303,7 +294,6 @@ class VerifyUsernameTestCase(TestCase):
             is_unique = self.auth.verify_username_unique(username=username)
             self.assertTrue(is_unique)
 
-    # Edge cases
     def test_no_args(self):
         '''Testing passing no arguments'''
         with app.test_client() as client:
@@ -418,7 +408,7 @@ class GetNewUserDataTestCase(TestCase):
             form = CreateUserForm()
             form.username.data = 'uniqueUser'
             form.email.data = 'unique@email.com'
-            form.password.data = 'password'
+            form.passworfd.data = 'password'
             form.confirm_password.data = 'password'
 
             user_data = self.auth.get_new_user_data(form)
