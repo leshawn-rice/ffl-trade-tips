@@ -106,17 +106,30 @@ class UserAuthentication:
         else:
             return False
 
-    def get_user_data(self, form):
+    def get_new_user_data(self, form=None):
         '''
         Gets the entered data from the form
         and returns it as a list
         '''
-        email = form.email.data
-        username = form.username.data
-        password = form.password.data
-        confirm_password = form.confirm_password.data
 
-        return [email, username, password, confirm_password]
+        if not form:
+            return None
+
+        try:
+            email = form.email.data
+            username = form.username.data
+            password = form.password.data
+            confirm_password = form.confirm_password.data
+        except AttributeError:
+            return None
+
+        data = [email, username, password, confirm_password]
+
+        for item in data:
+            if not isinstance(item, str):
+                return None
+
+        return data
 
     def create_user(self, user_data):
         '''
@@ -153,7 +166,9 @@ class UserAuthentication:
         Creates a new user,
         And logs the user in
         '''
-        new_user_data = self.get_user_data(form)
+        new_user_data = self.get_new_user_data(form)
+        if not new_user_data:
+            return False
         if self.verify_user_data(new_user_data):
             return self.create_user(new_user_data)
         else:

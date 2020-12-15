@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from unittest import TestCase
 from app.app import app
 from app.database import db, add_to_db
+from app.forms import CreateUserForm, LoginForm
 from user.auth import UserAuthentication
 from user.models import UserModel
 
@@ -330,3 +331,147 @@ class VerifyUsernameTestCase(TestCase):
             client.get('/')
             is_unique = self.auth.verify_username_unique(username=True)
             self.assertFalse(is_unique)
+
+
+class VerifyUserDataTestCase(TestCase):
+    def setUp(self):
+        self.auth = UserAuthentication()
+        create_test_user(auth=self.auth)
+
+    def tearDown(self):
+        db.session.rollback()
+
+    # Expected Cases
+    def test_good_data(self):
+        '''Testing unique data, passwords match'''
+        with app.test_client() as client:
+            client.get('/')
+            username = 'uniqueUser'
+            email = 'unique@email.com'
+            password = 'password'
+            is_verified = self.auth.verify_user_data(
+                [email, username, password, password])
+            self.assertTrue(is_verified)
+
+    def test_bad_username(self):
+        '''Testing non-unique username'''
+        with app.test_client() as client:
+            client.get('/')
+            username = 'testuser'
+            email = 'unique@email.com'
+            password = 'password'
+            is_verified = self.auth.verify_user_data(
+                [email, username, password, password])
+            self.assertFalse(is_verified)
+
+    def test_bad_email(self):
+        '''Testing non-unique email'''
+        with app.test_client() as client:
+            client.get('/')
+            username = 'uniqueUser'
+            email = 'test@email.com'
+            password = 'password'
+            is_verified = self.auth.verify_user_data(
+                [email, username, password, password])
+            self.assertFalse(is_verified)
+
+    def test_bad_password(self):
+        '''Testing non-matching passwords'''
+        with app.test_client() as client:
+            client.get('/')
+            username = 'testuser'
+            email = 'test@email.com'
+            password = 'password'
+            is_verified = self.auth.verify_user_data(
+                [email, username, password, 'N0Match'])
+            self.assertFalse(is_verified)
+
+    # Edge Cases
+    def test_invalid_data(self):
+        '''Testing various invalid types as elements in user_data'''
+        with app.test_client() as client:
+            client.get('/')
+            self.assertFalse(
+                self.auth.verify_user_data(['uniqueemail@email.com', 'uniqueUser', None, 'password']))
+            self.assertFalse(
+                self.auth.verify_user_data(['uniqueemail@email.com', None, 'password', 'password']))
+            self.assertFalse(
+                self.auth.verify_user_data([None, 'uniqueUser', 'password', 'password']))
+            self.assertFalse(
+                self.auth.verify_user_data([9, 'uniqueUser', 'password', 'password']))
+            self.assertFalse(
+                self.auth.verify_user_data(['uniqueemail@email.com', True, 'password', 'password']))
+
+
+class GetNewUserDataTestCase(TestCase):
+    def setUp(self):
+        self.auth = UserAuthentication()
+        create_test_user(auth=self.auth)
+
+    def tearDown(self):
+        db.session.rollback()
+
+    def test_good_data(self):
+        '''Testing valid data'''
+        with app.test_client() as client:
+            client.get('/')
+            form = CreateUserForm()
+            form.username.data = 'uniqueUser'
+            form.email.data = 'unique@email.com'
+            form.password.data = 'password'
+            form.confirm_password.data = 'password'
+
+            user_data = self.auth.get_new_user_data(form)
+
+            self.assertIsInstance(user_data, list)
+            self.assertEqual(
+                user_data, ['unique@email.com', 'uniqueUser', 'password', 'password'])
+
+    def test_no_data(self):
+        '''Testing no data'''
+        with app.test_client() as client:
+            client.get('/')
+            user_data = self.auth.get_new_user_data()
+            self.assertIsNone(user_data)
+
+    def test_bad_username(self):
+        '''Testing invalid username'''
+        with app.test_client() as client:
+            client.get('/')
+            form = CreateUserForm()
+            form.username.data = None
+            form.email.data = 'unique@email.com'
+            form.password.data = 'password'
+            form.confirm_password.data = 'password'
+
+            user_data = self.auth.get_new_user_data(form)
+
+            self.assertIsNone(user_data)
+
+    def test_bad_email(self):
+        '''Testing invalid email'''
+        with app.test_client() as client:
+            client.get('/')
+            form = CreateUserForm()
+            form.username.data = 'uniqueUser'
+            form.email.data = 7
+            form.password.data = 'password'
+            form.confirm_password.data = 'password'
+
+            user_data = self.auth.get_new_user_data(form)
+
+            self.assertIsNone(user_data)
+
+    def test_bad_password(self):
+        '''Testing invalid passwords'''
+        with app.test_client() as client:
+            client.get('/')
+            form = CreateUserForm()
+            form.username.data = 'uniqueUser'
+            form.email.data = 'unique@email.com'
+            form.password.data = True
+            form.confirm_password.data = True
+
+            user_data = self.auth.get_new_user_data(form)
+
+            self.assertIsNone(user_data)
