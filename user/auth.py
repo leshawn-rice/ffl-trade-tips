@@ -131,7 +131,7 @@ class UserAuthentication:
 
         return data
 
-    def create_user(self, user_data):
+    def create_user(self, user_data=None):
         '''
         Creates a new user with the given user_data,
         adds them to the db, and sets the user's id 

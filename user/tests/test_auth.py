@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from unittest import TestCase
 from app.app import app
-from app.database import db, add_to_db
+from app.database import db, add_to_db, delete_from_db
 from app.forms import CreateUserForm, LoginForm
 from user.auth import UserAuthentication
 from user.models import UserModel
@@ -11,7 +11,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///ffl_trade_tips_test'
 app.config['SQLALCHEMY_ECHO'] = False
 
 db.drop_all()
-db.create_all()
 
 
 def create_test_user(auth):
@@ -202,11 +201,12 @@ class VerifyNewPasswordTestCase(TestCase):
 class VerifyEmailTestCase(TestCase):
 
     def setUp(self):
+        db.create_all()
         self.auth = UserAuthentication()
         create_test_user(auth=self.auth)
 
     def tearDown(self):
-        db.session.rollback()
+        db.drop_all()
 
     def test_match(self):
         '''Testing test@email.com vs test@email.com'''
@@ -264,11 +264,12 @@ class VerifyEmailTestCase(TestCase):
 class VerifyUsernameTestCase(TestCase):
 
     def setUp(self):
+        db.create_all()
         self.auth = UserAuthentication()
         create_test_user(auth=self.auth)
 
     def tearDown(self):
-        db.session.rollback()
+        db.drop_all()
 
     def test_match(self):
         '''Testing testuser vs testuser'''
@@ -325,13 +326,13 @@ class VerifyUsernameTestCase(TestCase):
 
 class VerifyUserDataTestCase(TestCase):
     def setUp(self):
+        db.create_all()
         self.auth = UserAuthentication()
         create_test_user(auth=self.auth)
 
     def tearDown(self):
-        db.session.rollback()
+        db.drop_all()
 
-    # Expected Cases
     def test_good_data(self):
         '''Testing unique data, passwords match'''
         with app.test_client() as client:
@@ -395,11 +396,12 @@ class VerifyUserDataTestCase(TestCase):
 
 class GetNewUserDataTestCase(TestCase):
     def setUp(self):
+        db.create_all()
         self.auth = UserAuthentication()
         create_test_user(auth=self.auth)
 
     def tearDown(self):
-        db.session.rollback()
+        db.drop_all()
 
     def test_good_data(self):
         '''Testing valid data'''
@@ -408,7 +410,7 @@ class GetNewUserDataTestCase(TestCase):
             form = CreateUserForm()
             form.username.data = 'uniqueUser'
             form.email.data = 'unique@email.com'
-            form.passworfd.data = 'password'
+            form.password.data = 'password'
             form.confirm_password.data = 'password'
 
             user_data = self.auth.get_new_user_data(form)
@@ -465,3 +467,58 @@ class GetNewUserDataTestCase(TestCase):
             user_data = self.auth.get_new_user_data(form)
 
             self.assertIsNone(user_data)
+
+
+class CreateUserTestCase(TestCase):
+    def setUp(self):
+        db.create_all()
+        self.auth = UserAuthentication()
+        create_test_user(auth=self.auth)
+
+    def tearDown(self):
+        db.drop_all()
+
+    def test_successful_creation(self):
+        '''Testing good data that should result in successful user creation'''
+        with app.test_client() as client:
+            client.get('/')
+            user_data = ['unique@email.com',
+                         'uniqueUser', 'password', 'password']
+
+            user = self.auth.create_user(user_data=user_data)
+            matching_user = UserModel.query.get(user.id)
+
+            self.assertTrue(user)
+            self.assertIsInstance(user, UserModel)
+            self.assertTrue(matching_user)
+            self.assertEqual(user, matching_user)
+
+
+class DeleteTestCase(TestCase):
+    def setUp(self):
+        db.create_all()
+        self.auth = UserAuthentication()
+        create_test_user(auth=self.auth)
+
+    def tearDown(self):
+        db.drop_all()
+
+
+class SignUpTestCase(TestCase):
+    def setUp(self):
+        db.create_all()
+        self.auth = UserAuthentication()
+        create_test_user(auth=self.auth)
+
+    def tearDown(self):
+        db.drop_all()
+
+
+class LoginTestCase(TestCase):
+    def setUp(self):
+        db.create_all()
+        self.auth = UserAuthentication()
+        create_test_user(auth=self.auth)
+
+    def tearDown(self):
+        db.drop_all()
