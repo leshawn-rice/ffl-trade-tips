@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from unittest import TestCase
 from app.app import app
+from app.database import db, add_to_db
 from user.auth import UserAuthentication
 from user.models import UserModel
 
@@ -8,14 +9,8 @@ app.config['TESTING'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///ffl_trade_tips_test'
 app.config['SQLALCHEMY_ECHO'] = False
 
-test_db = SQLAlchemy()
-test_db.app = app
-test_db.init_app(app)
-
-
-def add_to_test_db(item):
-    test_db.session.add(item)
-    test_db.session.commit()
+db.drop_all()
+db.create_all()
 
 
 def create_test_user(auth):
@@ -24,7 +19,7 @@ def create_test_user(auth):
     test_password = auth.create_hashed_password('test_password')
     test_user = UserModel(username=test_username,
                           email=test_email, password=test_password)
-    add_to_test_db(test_user)
+    db.session.add(test_user)
 
 
 class HashPasswordTestCase(TestCase):
@@ -33,27 +28,27 @@ class HashPasswordTestCase(TestCase):
 
     # Expected cases
     def test_lowercase(self):
-        '''Testing for lower case password '''
+        '''Testing password '''
         hashedpw = self.auth.create_hashed_password('password')
         self.assertIn('$2b$12$', hashedpw)
 
     def test_uppercase(self):
-        '''Testing for upper case password '''
+        '''Testing PASSWORD'''
         hashedpw = self.auth.create_hashed_password('PASSWORD')
         self.assertIn('$2b$12$', hashedpw)
 
     def test_mixed_case(self):
-        '''Testing for mixed case password '''
+        '''Testing PassWord'''
         hashedpw = self.auth.create_hashed_password('PassWord')
         self.assertIn('$2b$12$', hashedpw)
 
     def test_mixed_numbers(self):
-        '''Testing for mixed case password with numbers '''
+        '''Testing 1PassW0rd7'''
         hashedpw = self.auth.create_hashed_password('1PassW0rd7')
         self.assertIn('$2b$12$', hashedpw)
 
     def test_mixed_numbers_symbols(self):
-        '''Testing for mixed case password with numbers and symbols '''
+        '''Testing B@k3Ry!*+C@$h'''
 
         hashedpw = self.auth.create_hashed_password('B@k3Ry!*+C@$h')
         self.assertIn('$2b$12$', hashedpw)
@@ -85,21 +80,21 @@ class ComparePasswordTestCase(TestCase):
         self.auth = UserAuthentication()
 
     # Expected cases
-    def test_matching(self):
-        '''Testing passwords that match completely'''
+    def test_match(self):
+        '''Testing password vs hash for password'''
         pw = 'password'
         hashedpw = self.auth.create_hashed_password(pw)
         is_match = self.auth.compare_passwords(hashedpw, pw)
         self.assertTrue(is_match)
 
     def test_different_case(self):
-        '''Testing passwords that match but have different casing'''
+        '''Testing password vs hash for PassWord'''
         hashedpw = self.auth.create_hashed_password('password')
         is_match = self.auth.compare_passwords(hashedpw, 'PassWord')
         self.assertFalse(is_match)
 
     def test_no_match(self):
-        '''Testing passwords that do not match at all'''
+        '''Testing password vs hash for bucket0fEggs'''
         hashedpw = self.auth.create_hashed_password('password')
         is_match = self.auth.compare_passwords(hashedpw, 'bucket0fEggs')
         self.assertFalse(is_match)
@@ -139,49 +134,69 @@ class VerifyNewPasswordTestCase(TestCase):
     def setUp(self):
         self.auth = UserAuthentication()
 
-    def test_verify_new_password_match(self):
-        '''Testing verify_new_password_match for matches & mismatches'''
+    # Expected cases
+    def test_match(self):
+        '''Testing password vs password'''
         with app.test_client() as client:
             client.get('/')
-            # Two matching passwords
             pw = 'password'
             confirm_pw = 'password'
             is_match = self.auth.verify_new_password_match(
                 password=pw, confirm_password=confirm_pw)
             self.assertTrue(is_match)
-            # Passwords that match but have different casing
+
+    def test_different_case(self):
+        '''Testing password vs PassWord'''
+        with app.test_client() as client:
+            client.get('/')
             pw = 'password'
-            confirm_pw = 'Password'
-            is_match = self.auth.verify_new_password_match(
-                password=pw, confirm_password=confirm_pw)
-            self.assertFalse(is_match)
-            # Passwords that do not match
-            pw = 'password'
-            confirm_pw = 'bucket0feggs'
+            confirm_pw = 'PassWord'
             is_match = self.auth.verify_new_password_match(
                 password=pw, confirm_password=confirm_pw)
             self.assertFalse(is_match)
 
-    def test_verify_new_password_invalid(self):
-        '''Testing sending invalid data to verify_new_password_match'''
+    def test_no_match(self):
+        '''Testing password vs bucket0fEggs'''
         with app.test_client() as client:
             client.get('/')
-            # No args
+            pw = 'password'
+            confirm_pw = 'bucket0fEggs'
+            is_match = self.auth.verify_new_password_match(
+                password=pw, confirm_password=confirm_pw)
+            self.assertFalse(is_match)
+
+    # Edge cases
+    def test_no_args(self):
+        '''Testing passing no arguments'''
+        with app.test_client() as client:
+            client.get('/')
             is_match = self.auth.verify_new_password_match()
             self.assertFalse(is_match)
-            # NoneType args
+
+    def test_nonetype_args(self):
+        '''Testing passing arguments of type NoneType'''
+        with app.test_client() as client:
+            client.get('/')
             pw = None
             confirm_pw = None
             is_match = self.auth.verify_new_password_match(
                 password=pw, confirm_password=confirm_pw)
             self.assertFalse(is_match)
-            # int args
+
+    def test_int_args(self):
+        '''Testing passing arguments of type Integer'''
+        with app.test_client() as client:
+            client.get('/')
             pw = 3
             confirm_pw = 3
             is_match = self.auth.verify_new_password_match(
                 password=pw, confirm_password=confirm_pw)
             self.assertFalse(is_match)
-            # boolean args
+
+    def test_bool_args(self):
+        '''Testing passing arguments of type Boolean'''
+        with app.test_client() as client:
+            client.get('/')
             pw = True
             confirm_pw = True
             is_match = self.auth.verify_new_password_match(
@@ -189,13 +204,129 @@ class VerifyNewPasswordTestCase(TestCase):
             self.assertFalse(is_match)
 
 
-# class VerifyEmailTestCase(TestCase):
-#     def setUpClass():
-#         self.auth = UserAuthentication()
+class VerifyEmailTestCase(TestCase):
 
-#     def setUp(self):
-#         test_db.create_all()
-#         create_test_user(auth=self.auth)
+    def setUp(self):
+        self.auth = UserAuthentication()
+        create_test_user(auth=self.auth)
 
-#     def tearDown(self):
-#         test_db.drop_all()
+    def tearDown(self):
+        db.session.rollback()
+
+    # Expected Cases
+    def test_match(self):
+        '''Testing test@email.com vs test@email.com'''
+        with app.test_client() as client:
+            client.get('/')
+            email = 'test@email.com'
+            is_unique = self.auth.verify_email_unique(email=email)
+            self.assertFalse(is_unique)
+
+    def test_different_case(self):
+        '''Testing TeSt@emAiL.coM vs test@email.com'''
+        with app.test_client() as client:
+            client.get('/')
+            email = 'TeSt@emAiL.coM'
+            is_unique = self.auth.verify_email_unique(email=email)
+            self.assertFalse(is_unique)
+
+    def test_unique(self):
+        '''Testing buttersoup@dairy.com vs test@email.com'''
+        with app.test_client() as client:
+            client.get('/')
+            email = 'buttersoup@dairy.com'
+            is_unique = self.auth.verify_email_unique(email=email)
+            self.assertTrue(is_unique)
+
+    # Edge cases
+    def test_no_args(self):
+        '''Testing passing no arguments'''
+        with app.test_client() as client:
+            client.get('/')
+            is_unique = self.auth.verify_email_unique()
+            self.assertFalse(is_unique)
+
+    def test_nonetype_args(self):
+        '''Testing passing argument of type NoneType'''
+        with app.test_client() as client:
+            client.get('/')
+            is_unique = self.auth.verify_email_unique(email=None)
+            self.assertFalse(is_unique)
+
+    def test_int_args(self):
+        '''Testing passing argument of type Integer'''
+        with app.test_client() as client:
+            client.get('/')
+            is_unique = self.auth.verify_email_unique(email=7)
+            self.assertFalse(is_unique)
+
+    def test_bool_args(self):
+        '''Testing passing argument of type Boolean'''
+        with app.test_client() as client:
+            client.get('/')
+            is_unique = self.auth.verify_email_unique(email=True)
+            self.assertFalse(is_unique)
+
+
+class VerifyUsernameTestCase(TestCase):
+
+    def setUp(self):
+        self.auth = UserAuthentication()
+        create_test_user(auth=self.auth)
+
+    def tearDown(self):
+        db.session.rollback()
+
+    # Expected Cases
+    def test_match(self):
+        '''Testing testuser vs testuser'''
+        with app.test_client() as client:
+            client.get('/')
+            username = 'testuser'
+            is_unique = self.auth.verify_username_unique(username=username)
+            self.assertFalse(is_unique)
+
+    def test_different_case(self):
+        '''Testing TeStUSer vs testuser'''
+        with app.test_client() as client:
+            client.get('/')
+            username = 'TeStUSer'
+            is_unique = self.auth.verify_username_unique(username=username)
+            self.assertFalse(is_unique)
+
+    def test_unique(self):
+        '''Testing M33rkatse7en vs testuser'''
+        with app.test_client() as client:
+            client.get('/')
+            username = 'M33rkatse7en'
+            is_unique = self.auth.verify_username_unique(username=username)
+            self.assertTrue(is_unique)
+
+    # Edge cases
+    def test_no_args(self):
+        '''Testing passing no arguments'''
+        with app.test_client() as client:
+            client.get('/')
+            is_unique = self.auth.verify_username_unique()
+            self.assertFalse(is_unique)
+
+    def test_nonetype_args(self):
+        '''Testing passing argument of type NoneType'''
+        with app.test_client() as client:
+            client.get('/')
+            is_unique = self.auth.verify_username_unique(username=None)
+            self.assertFalse(is_unique)
+
+    def test_int_args(self):
+        '''Testing passing argument of type Integer'''
+        with app.test_client() as client:
+            client.get('/')
+            is_unique = self.auth.verify_username_unique(username=7)
+            self.assertFalse(is_unique)
+
+    def test_bool_args(self):
+        '''Testing passing argument of type Boolean'''
+        with app.test_client() as client:
+            client.get('/')
+            is_unique = self.auth.verify_username_unique(username=True)
+            self.assertFalse(is_unique)

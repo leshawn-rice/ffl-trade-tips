@@ -15,11 +15,8 @@ class UserAuthentication:
         Creates and returns a hashed version of the
         given password
         '''
-        # If the password is none, return None
-        if not password:
-            return None
-        # If the password is not a str, return None
-        if not isinstance(password, str):
+        # If the password is None or not a string, return None
+        if not password or not isinstance(password, str):
             return None
 
         hashed_password = bcrypt.generate_password_hash(
@@ -58,35 +55,50 @@ class UserAuthentication:
             flash('Passwords Must Match!')
             return False
 
-    def verify_email_unique(self, email):
+    def verify_email_unique(self, email=None):
         '''
         Verifies the given email does not exist
         in UserModel table
         '''
-        if not UserModel.query.filter_by(email=email).first():
+
+        if not email or not isinstance(email, str):
+            return False
+
+        if not UserModel.query.filter(UserModel.email.ilike(email)).first():
             return True
         else:
             session['email_taken'] = True
             return False
 
-    def verify_username_unique(self, username):
+    def verify_username_unique(self, username=None):
         '''
         Verifies the given username does not exist
         in UserModel table
         '''
-        if not UserModel.query.filter_by(username=username).first():
+
+        if not username or not isinstance(username, str):
+            return False
+
+        if not UserModel.query.filter(UserModel.username.ilike(username)).first():
             return True
         else:
             session['username_taken'] = True
             return False
 
-    def verify_user_data(self, user_data):
+    def verify_user_data(self, user_data=None):
         '''
         Verifies that none of the given user data
         conflicts with existing users, and that
         the given passwords match. Returns True
         or False based on the result
         '''
+        if not user_data:
+            return False
+
+        for item in user_data:
+            if not isinstance(item, str):
+                return False
+
         [email, username, password, confirm_password] = user_data
 
         if self.verify_username_unique(username) and self.verify_email_unique(email) and self.verify_new_password_match(password, confirm_password):
