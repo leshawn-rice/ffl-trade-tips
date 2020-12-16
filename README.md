@@ -6,7 +6,7 @@
 ### add their ESPN Fantasy Football Public leagues to their
 ### account, generate trade suggestions, and simulate trades
 
-### This project was built with:
+# This project was built with:
 - Python - Flask, Flask-SQLAlchemy, Flask-WTForms, Flask-BCrypt, Flask-Mail
 - PostgreSQL
 - Bootstrap
