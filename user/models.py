@@ -19,6 +19,9 @@ class UserModel(db.Model):
         'LeagueModel', cascade='all, delete', backref='user')
     teams = db.relationship('TeamModel', cascade='all, delete', backref='user')
 
+    def __repr__(self):
+        return f'<UserModel id={self.id} username={self.username} email={self.email}>'
+
 
 class TradeModel(db.Model):
     '''

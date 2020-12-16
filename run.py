@@ -9,7 +9,6 @@ import espn.views
 
 mail = Mail(app)
 
-# Update readme
 # Deploy
 
 

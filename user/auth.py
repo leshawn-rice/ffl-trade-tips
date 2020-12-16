@@ -134,7 +134,7 @@ class UserAuthentication:
     def create_user(self, user_data=None):
         '''
         Creates a new user with the given user_data,
-        adds them to the db, and sets the user's id 
+        adds them to the db, and sets the user's id
         into the session.
         '''
         if not user_data:
@@ -156,7 +156,7 @@ class UserAuthentication:
     def delete(self, user_id):
         '''
         Deletes the user with user_id
-        from the database and flashes 
+        from the database and flashes
         a success message
         404's if the user_id can't be found
         '''
@@ -211,7 +211,7 @@ class UserAuthentication:
             return False
 
         user = UserModel.query.filter(
-            username.upper() == username.upper()).first()
+            UserModel.username.ilike(username)).first()
 
         if user:
             if self.compare_passwords(user.password, password):
