@@ -8,7 +8,7 @@
 
 ### User Flows:
 #### Index -> Login/Sign Up -> Sign Up
-![Signing Up Demo](/app/static/img/signup.gif)
+![Signing Up Demo](app/static/img/signup.gif)
 
 # This project was built with:
 - Python: Flask, Flask-SQLAlchemy, Flask-WTForms, Flask-BCrypt, Flask-Mail
