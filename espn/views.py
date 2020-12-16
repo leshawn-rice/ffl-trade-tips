@@ -43,29 +43,6 @@ def add_league():
         return render_template('add_league.html', form=form)
 
 
-@app.route('/leagues/<int:league_id>/refresh', methods=['GET', 'POST'])
-def refresh_league(league_id):
-    '''
-    Displays the form, and handles the form, for when
-    a player needs to refresh a league
-    '''
-    # e_league stands for existing league
-    e_league = LeagueModel.query.get(league_id)
-    form = AddLeagueForm(obj=e_league)
-
-    if form.validate_on_submit():
-        league = league_handler.add_league(form)
-        if league:
-            user_id = session.get('user_id')
-            league_model = LeagueModel.query.filter_by(
-                league_id=form.league_id.data, user_id=user_id).first()
-            return redirect(f'/leagues/{league_model.id}/select-team')
-        else:
-            return render_template('add_league.html', form=form)
-    else:
-        return render_template('add_league.html', form=form)
-
-
 @app.route('/leagues')
 def show_leagues():
     '''
@@ -91,6 +68,29 @@ def league_page(league_id):
         return render_template('league.html', league=league, user_team=user_team)
 
     return redirect('/leagues')
+
+
+@app.route('/leagues/<int:league_id>/refresh', methods=['GET', 'POST'])
+def refresh_league(league_id):
+    '''
+    Displays the form, and handles the form, for when
+    a player needs to refresh a league
+    '''
+    # e_league stands for existing league
+    e_league = LeagueModel.query.get(league_id)
+    form = AddLeagueForm(obj=e_league)
+
+    if form.validate_on_submit():
+        league = league_handler.add_league(form)
+        if league:
+            user_id = session.get('user_id')
+            league_model = LeagueModel.query.filter_by(
+                league_id=form.league_id.data, user_id=user_id).first()
+            return redirect(f'/leagues/{league_model.id}/select-team')
+        else:
+            return render_template('add_league.html', form=form)
+    else:
+        return render_template('add_league.html', form=form)
 
 
 @app.route('/leagues/<int:league_id>/delete')
