@@ -1,6 +1,6 @@
 # *[Fantasy Football Trade Tips v1](https://www.ffl-trade-tips.herokuapp.com)*
-
-### This project uses the ESPN Fantasy Sports API v3
+## *(https://www.ffl-trade-tips.herokuapp.com)*
+### This project uses the __ESPN Fantasy Sports API v3__
 
 ### FFL Trade Tips V1 allows the user to create an account,
 ### add their ESPN Fantasy Football Public leagues to their
