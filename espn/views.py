@@ -26,7 +26,7 @@ def show_news():
 def add_league():
     '''
     Displays the form, and handles the form, for when
-    a player needs to add or refresh a league
+    a player needs to add a league
     '''
     form = AddLeagueForm()
 
@@ -43,21 +43,27 @@ def add_league():
         return render_template('add_league.html', form=form)
 
 
-@app.route('/leagues/<int:league_id>/delete')
-def delete_league(league_id):
+@app.route('/leagues/<int:league_id>/refresh', methods=['GET', 'POST'])
+def refresh_league(league_id):
     '''
-    Deletes the league with id league_id from
-    the database, if authentication succeeds.
-    Otherwise returns home
+    Displays the form, and handles the form, for when
+    a player needs to refresh a league
     '''
-    league = LeagueModel.query.get_or_404(league_id)
-    if 'user_id' not in session:
-        flash('You need to be logged in to do that!', 'danger')
-    elif league.user_id == session.get('user_id'):
-        league_handler.delete(league_id)
+    # e_league stands for existing league
+    e_league = LeagueModel.query.get(league_id)
+    form = AddLeagueForm(obj=e_league)
+
+    if form.validate_on_submit():
+        league = league_handler.add_league(form)
+        if league:
+            user_id = session.get('user_id')
+            league_model = LeagueModel.query.filter_by(
+                league_id=form.league_id.data, user_id=user_id).first()
+            return redirect(f'/leagues/{league_model.id}/select-team')
+        else:
+            return render_template('add_league.html', form=form)
     else:
-        flash('You cannot delete an account that isn\'t yours!', 'danger')
-    return redirect('/')
+        return render_template('add_league.html', form=form)
 
 
 @app.route('/leagues')
@@ -85,6 +91,23 @@ def league_page(league_id):
         return render_template('league.html', league=league, user_team=user_team)
 
     return redirect('/leagues')
+
+
+@app.route('/leagues/<int:league_id>/delete')
+def delete_league(league_id):
+    '''
+    Deletes the league with id league_id from
+    the database, if authentication succeeds.
+    Otherwise returns home
+    '''
+    league = LeagueModel.query.get_or_404(league_id)
+    if 'user_id' not in session:
+        flash('You need to be logged in to do that!', 'danger')
+    elif league.user_id == session.get('user_id'):
+        league_handler.delete(league_id)
+    else:
+        flash('You cannot delete an account that isn\'t yours!', 'danger')
+    return redirect('/')
 
 
 @app.route('/leagues/<int:league_id>/select-team', methods=['GET', 'POST'])
