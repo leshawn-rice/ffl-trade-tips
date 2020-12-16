@@ -13,13 +13,13 @@
 ![Signing Up Demo](app/static/img/signup.gif)
 ### Add a League
 #### Sign Up -> Add A League -> Index
-![Add a League Demo](app/static/img/addaleague.gif)
+![Add a League Demo](app/static/img/addleague.gif)
 ### General Flow
 #### Index -> (if not signed in) Login -> Leagues -> League X -> Team Y -> Player Z
 ![General Demo](app/static/img/generalflow.gif)
 ### View Saved Trades
 #### Index -> Profile 
-![View Saved Trades Demo](app/static/img/addaleague.gif)
+![View Saved Trades Demo](app/static/img/viewsavedtrades.gif)
 # This project was built with:
 - Python: Flask, Flask-SQLAlchemy, Flask-WTForms, Flask-BCrypt, Flask-Mail
 - PostgreSQL
