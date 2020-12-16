@@ -49,9 +49,9 @@ class LeagueModelHandler(ModelHandlerBase):
         the instance attribute
         '''
         league = LeagueModel.query.filter_by(
-            league_id=self.instance.id, user_id=self.instance.user_id)
+            league_id=self.instance.id, user_id=self.instance.user_id).first()
         self.update_league_info(league)
-        self.instance.league_info['league_model_id'] = record.id
+        self.instance.league_info['league_model_id'] = league.id
 
     def check_for_record_update(self):
         '''

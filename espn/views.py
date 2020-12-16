@@ -43,6 +43,23 @@ def add_league():
         return render_template('add_league.html', form=form)
 
 
+@app.route('/leagues/<int:league_id>/delete')
+def delete_league(league_id):
+    '''
+    Deletes the league with id league_id from
+    the database, if authentication succeeds.
+    Otherwise returns home
+    '''
+    league = LeagueModel.query.get_or_404(league_id)
+    if 'user_id' not in session:
+        flash('You need to be logged in to do that!', 'danger')
+    elif league.user_id == session.get('user_id'):
+        league_handler.delete(league_id)
+    else:
+        flash('You cannot delete an account that isn\'t yours!', 'danger')
+    return redirect('/')
+
+
 @app.route('/leagues')
 def show_leagues():
     '''
@@ -61,6 +78,8 @@ def league_page(league_id):
     if 'user_id' not in session:
         return redirect('/login')
     league = LeagueModel.query.get(league_id)
+    if not league:
+        return redirect('/leagues')
     if league.user_id == session.get('user_id'):
         user_team = TeamModel.query.get_or_404(league.user_team)
         return render_template('league.html', league=league, user_team=user_team)
@@ -100,23 +119,6 @@ def show_trade_sim(league_id):
         else:
             flash('There was an error in simulating your trade!', 'danger')
             return redirect(f'/leagues/{league_id}')
-
-
-@app.route('/leagues/<int:league_id>/delete')
-def delete_league(league_id):
-    '''
-    Deletes the league with id league_id from
-    the database, if authentication succeeds.
-    Otherwise returns home
-    '''
-    league = LeagueModel.query.get_or_404(league_id)
-    if 'user_id' not in session:
-        flash('You need to be logged in to do that!', 'danger')
-    elif league.user_id == session.get('user_id'):
-        league_handler.delete(league_id)
-    else:
-        flash('You cannot delete an account that isn\'t yours!', 'danger')
-    return redirect('/')
 
 
 @app.route('/teams/<int:team_id>')

@@ -105,6 +105,11 @@ class GradeCalculator:
         '''
         score = self.get_score(player)
 
+        # Currently this gets the max and min
+        # I am going to change this to use the
+        # Standard deviation from the avg to
+        # Calculate the grade
+
         pos_max = self.extremes[player.position]['MAX']
         if pos_max:
             if score > pos_max:

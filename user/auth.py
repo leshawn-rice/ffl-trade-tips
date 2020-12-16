@@ -137,7 +137,15 @@ class UserAuthentication:
         adds them to the db, and sets the user's id 
         into the session.
         '''
+        if not user_data:
+            return None
+
         [email, username, password, confirm_password] = user_data
+
+        for item in user_data:
+            if not item or not isinstance(item, str):
+                return None
+
         hashed_password = self.create_hashed_password(password)
         new_user = UserModel(
             email=email, username=username, password=hashed_password)
@@ -152,11 +160,15 @@ class UserAuthentication:
         a success message
         404's if the user_id can't be found
         '''
-        user = UserModel.query.get_or_404(user_id)
-        delete_from_db(user)
-        flash('Account Deleted Successfuly', 'success')
+        user = UserModel.query.get(user_id)
+        if not user:
+            flash('Account could not be deleted!', 'danger')
+            return
+        else:
+            delete_from_db(user)
+            flash('Account Deleted Successfuly', 'success')
 
-    def sign_up(self, form):
+    def sign_up(self, form=None):
         '''
         Drives the logic behind signing up a new user
         Gets data from the form,
@@ -166,6 +178,10 @@ class UserAuthentication:
         Creates a new user,
         And logs the user in
         '''
+
+        if not form:
+            return False
+
         new_user_data = self.get_new_user_data(form)
         if not new_user_data:
             return False
@@ -174,7 +190,7 @@ class UserAuthentication:
         else:
             return False
 
-    def log_in(self, form):
+    def log_in(self, form=None):
         '''
         Checks if the username and password match a record
         in the UserModel table with the given username.
@@ -182,8 +198,17 @@ class UserAuthentication:
         and returns True. Otherwise, flashes 'Username/Password'
         do not match and returns False
         '''
-        username = form.username.data
-        password = form.password.data
+        if not form:
+            return False
+
+        try:
+            username = form.username.data
+            password = form.password.data
+        except AttributeError:
+            return False
+
+        if not isinstance(username, str) or not isinstance(password, str):
+            return False
 
         user = UserModel.query.filter(
             username.upper() == username.upper()).first()

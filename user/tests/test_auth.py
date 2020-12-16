@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from unittest import TestCase
 from app.app import app
-from app.database import db, add_to_db, delete_from_db
+from app.database import db, add_to_db
 from app.forms import CreateUserForm, LoginForm
 from user.auth import UserAuthentication
+from user import views
 from user.models import UserModel
 
 app.config['TESTING'] = True
@@ -19,7 +20,7 @@ def create_test_user(auth):
     test_password = auth.create_hashed_password('test_password')
     test_user = UserModel(username=test_username,
                           email=test_email, password=test_password)
-    db.session.add(test_user)
+    add_to_db(test_user)
 
 
 class HashPasswordTestCase(TestCase):
@@ -451,6 +452,22 @@ class CreateUserTestCase(TestCase):
             self.assertTrue(matching_user)
             self.assertEqual(user, matching_user)
 
+    def test_invalid_data(self):
+        '''Testing invalid user_data'''
+        with app.test_client() as client:
+            client.get('/')
+            # No user_data
+            user = self.auth.create_user()
+            self.assertIsNone(user)
+            # Invalid typed elements in user_data
+            user_data = [None, 7, True, True]
+            user = self.auth.create_user(user_data=user_data)
+            self.assertIsNone(user)
+            # Single invalid type element in user_data
+            user_data = [9, 'uniqueUser', 'password', 'password']
+            user = self.auth.create_user(user_data=user_data)
+            self.assertIsNone(user)
+
 
 class DeleteTestCase(TestCase):
     '''Test Case for UserAuthentication.delete()'''
@@ -462,6 +479,39 @@ class DeleteTestCase(TestCase):
 
     def tearDown(self):
         db.drop_all()
+
+    def test_successful_delete(self):
+        with app.test_client() as client:
+            client.get('/')
+            new_user = UserModel(username='newuser',
+                                 email='new@email.com', password='password')
+            add_to_db(new_user)
+            id_to_del = new_user.id
+
+            self.auth.delete(id_to_del)
+
+            self.assertIsNone(UserModel.query.get(id_to_del))
+
+    def test_unsuccessful_delete(self):
+        with app.test_client() as client:
+            client.get('/')
+
+            # Testing deleting an account different from current user
+            with client.session_transaction() as session:
+                session['user_id'] = 1
+            response = client.get('/users/10000/delete')
+            with client.session_transaction() as session:
+                flash_message = dict(session['_flashes']).get('danger')
+                self.assertEqual(
+                    flash_message, 'You cannot delete an account that isn\'t yours!')
+            # Testing deleting an account that doesn't exist
+            with client.session_transaction() as session:
+                session['user_id'] = 10000
+            response = client.get('/users/10000/delete')
+            with client.session_transaction() as session:
+                flash_message = dict(session['_flashes']).get('danger')
+                self.assertEqual(
+                    flash_message, 'Account could not be deleted!')
 
 
 class SignUpTestCase(TestCase):
@@ -475,9 +525,80 @@ class SignUpTestCase(TestCase):
     def tearDown(self):
         db.drop_all()
 
+    def test_successful_signup(self):
+        with app.test_client() as client:
+            client.get('/')
+            form = CreateUserForm()
+            form.username.data = 'uniqueUser'
+            form.email.data = 'unique@email.com'
+            form.password.data = 'password'
+            form.confirm_password.data = 'password'
+
+            is_created = self.auth.sign_up(form=form)
+            self.assertTrue(is_created)
+
+    def test_no_data(self):
+        '''Testing passing no form'''
+        with app.test_client() as client:
+            client.get('/')
+            is_created = self.auth.sign_up()
+            self.assertFalse(is_created)
+
+    def test_non_unique_data(self):
+        '''Testing non-unique data'''
+        with app.test_client() as client:
+            client.get('/')
+            form = CreateUserForm()
+            form.username.data = 'testuser'
+            form.email.data = 'test@email.com'
+            form.password.data = 'password'
+            form.confirm_password.data = 'password'
+
+            is_created = self.auth.sign_up(form=form)
+            self.assertFalse(is_created)
+
+    def test_bad_username(self):
+        '''Testing invalid username'''
+        with app.test_client() as client:
+            client.get('/')
+            form = CreateUserForm()
+            form.username.data = None
+            form.email.data = 'unique@email.com'
+            form.password.data = 'password'
+            form.confirm_password.data = 'password'
+
+            is_created = self.auth.sign_up(form=form)
+            self.assertFalse(is_created)
+
+    def test_bad_email(self):
+        '''Testing invalid email'''
+        with app.test_client() as client:
+            client.get('/')
+            form = CreateUserForm()
+            form.username.data = 'uniqueUser'
+            form.email.data = 7
+            form.password.data = 'password'
+            form.confirm_password.data = 'password'
+
+            is_created = self.auth.sign_up(form=form)
+            self.assertFalse(is_created)
+
+    def test_bad_password(self):
+        '''Testing invalid passwords'''
+        with app.test_client() as client:
+            client.get('/')
+            form = CreateUserForm()
+            form.username.data = 'uniqueUser'
+            form.email.data = 'unique@email.com'
+            form.password.data = True
+            form.confirm_password.data = True
+
+            is_created = self.auth.sign_up(form=form)
+            self.assertFalse(is_created)
+
 
 class LoginTestCase(TestCase):
-    '''Test Case for UserAuthentication.login'''
+    '''Test Case for UserAuthentication.log_in()'''
 
     def setUp(self):
         db.create_all()
@@ -486,3 +607,49 @@ class LoginTestCase(TestCase):
 
     def tearDown(self):
         db.drop_all()
+
+    def test_successful_login(self):
+        with app.test_client() as client:
+            client.get('/')
+            form = LoginForm()
+            form.username.data = 'testuser'
+            form.password.data = 'test_password'
+            is_logged = self.auth.log_in(form=form)
+            self.assertTrue(is_logged)
+
+    def test_no_data(self):
+        '''Testing passing no form'''
+        with app.test_client() as client:
+            client.get('/')
+            is_logged = self.auth.log_in()
+            self.assertFalse(is_logged)
+
+    def test_bad_username(self):
+        '''Testing invalid username'''
+        with app.test_client() as client:
+            client.get('/')
+            # Username of type NoneType
+            form = CreateUserForm()
+            form.username.data = None
+            form.password.data = 'password'
+            is_logged = self.auth.log_in(form=form)
+            self.assertFalse(is_logged)
+            # Unique username
+            form.username.data = 'uniqueUser'
+            is_logged = self.auth.log_in(form=form)
+            self.assertFalse(is_logged)
+
+    def test_bad_password(self):
+        '''Testing invalid passwords'''
+        with app.test_client() as client:
+            client.get('/')
+            # Password of type Boolean
+            form = CreateUserForm()
+            form.username.data = 'testuser'
+            form.password.data = True
+            is_logged = self.auth.log_in(form=form)
+            self.assertFalse(is_logged)
+            # Non-matching password
+            form.password.data = 'uniquePassword'
+            is_logged = self.auth.log_in(form=form)
+            self.assertFalse(is_logged)

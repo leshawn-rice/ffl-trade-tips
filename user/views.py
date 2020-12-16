@@ -76,7 +76,6 @@ def login():
         return redirect('/')
 
     form = LoginForm()
-
     if form.validate_on_submit():
         user = authentication.log_in(form)
         if user:
@@ -107,7 +106,6 @@ def signup():
         session.pop('email_taken')
 
     form = CreateUserForm()
-
     if form.validate_on_submit():
         user = authentication.sign_up(form)
         if user:
