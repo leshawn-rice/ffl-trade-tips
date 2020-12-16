@@ -10,13 +10,9 @@
     <div class="col text-center">
         <h1 class="display-4 text-center" id='settings'>Your Profile</h1>
         <hr>
-        <p class="lead"><strong>Username:</strong> {{user.username}} <a class="btn btn-sm btn-light"
-                href="/users/{{user.id}}/change-username">Change
-                Username</a></p>
-        <p class="lead"><strong>Email:</strong> {{user.email}} <a class="btn btn-sm btn-light"
-                href="/users/{{user.id}}/change-email">Change Email</a></p>
-        <p class="lead"><strong>Password:</strong> ********** <a class="btn btn-sm btn-light"
-                href="/users/{{user.id}}/change-password">Change Password</a></p>
+        <p class="lead"><strong>Username:</strong> {{user.username}}</p>
+        <p class="lead"><strong>Email:</strong> {{user.email}} </p>
+        <p class="lead"><strong>Password:</strong> ********** </p>
         <p class="lead"><strong>Leagues:</strong></p>
         <ul class="text-center" style="list-style-type:none;">
             {% for league in user.leagues %}
