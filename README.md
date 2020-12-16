@@ -1,5 +1,4 @@
-# Fantasy Football Trade Tips v1
-## ffl-trade-tips.herokuapp.com
+# *[Fantasy Football Trade Tips v1](https://www.ffl-trade-tips.herokuapp.com)*
 
 ### This project uses the ESPN Fantasy Sports API v3
 
