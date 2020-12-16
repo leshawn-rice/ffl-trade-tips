@@ -7,9 +7,19 @@
 ### I chose these features because simulating and generating trades is not something ESPN offers, but would be very useful. The scope of this projects is purposefully small-scale in v1 as its primary purpose it to showcase what I've learned thus far in Springboard's Software Engineering Bootcamp.
 
 ### User Flows:
+
+### Sign Up
 #### Index -> Login/Sign Up -> Sign Up
 ![Signing Up Demo](app/static/img/signup.gif)
-
+### Add a League
+#### Sign Up -> Add A League -> Index
+![Add a League Demo](app/static/img/addaleague.gif)
+### General Flow
+#### Index -> (if not signed in) Login -> Leagues -> League X -> Team Y -> Player Z
+![General Demo](app/static/img/generalflow.gif)
+### View Saved Trades
+#### Index -> Profile 
+![View Saved Trades Demo](app/static/img/addaleague.gif)
 # This project was built with:
 - Python: Flask, Flask-SQLAlchemy, Flask-WTForms, Flask-BCrypt, Flask-Mail
 - PostgreSQL
