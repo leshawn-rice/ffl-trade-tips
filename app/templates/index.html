@@ -14,20 +14,17 @@
 {% endif %}
 {% endwith %}
 
-<div class="jumbotron my-1 text-dark">
-    <h1 class="display-4">Welcome!</h1>
-    <p class="lead">This is the current working test for my capstone 1.</p>
-    <hr class="my-4">
-    <p>I need to finish trade suggestion functionality</p>
-    <p>I need to add league, team, player, and profile pages</p>
-    <p>I need to redo the design for the site.</p>
-    <hr class="my-4">
-    <p>Other than that this capstone is mostly done!</p>
-    <ul class="text-center">
-        {% for link in links %}
-        <li class="nav-link">{{link|safe}}</li>
-        {% endfor %}
-    </ul>
+<h1 class="display-3 text-center">Welcome to Fantasy Football Trade Tips v1</h1>
+
+<div class="row justify-content-center h-100">
+    <div class="col-12 col-md-6 h-100">
+        <img src="/static/img/player.jpg" alt="Player Profile Demo" class="img-fluid my-3">
+    </div>
 </div>
+
+
+<p class="lead text-center">Here you can add your ESPN Fantasy Football leagues, look at player stats, get
+    trade suggestions, and simulate trades! Trade suggestions, stats, player ranks, and player grades are based on your
+    league's specific scoring!</p>
 
 {% endblock %}
