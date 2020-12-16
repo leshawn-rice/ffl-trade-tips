@@ -12,6 +12,26 @@
 {% endif %}
 {% endwith %}
 
+
+<div class="modal fade text-dark" id="league-id-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h1 class="h5 text-center">How to find League ID</h5>
+            </div>
+            <div class="modal-body">
+                <p class="lead">In your web browser, go to fantasy.espn.com and open the league you are trying to add.
+                    In the address bar you will see:</p>
+                <img class="img-fluid" src="/static/img/leagueid.png" alt="ESPN Fantasy URL League ID Highlight">
+                <p class="lead">This is your league ID. The year is just the year the season started</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <form method="POST" id="add-league-form">
 
     {{form.hidden_tag()}}
@@ -22,21 +42,33 @@
     </div>
 
 
-    {% for field in form 
-                if field.widget.input_type != 'hidden' %}
 
     <div class="form-group row justify-content-center">
         <div class="col-8">
-            {{field.label}}
-            {{field(class_="form-control")}}
+            {{form.league_id.label}}
+            <div class="input-group">
+                {{form.league_id(class_="form-control")}}
+                <button class="input-group-text btn btn-sm btn-secondary" type="button" data-toggle="modal"
+                    data-target="#league-id-modal">?</button>
+            </div>
 
-            {% for error in field.errors %}
+            {% for error in form.league_id.errors %}
             <div class="badge badge-danger">{{error}}</div>
             {% endfor %}
         </div>
     </div>
 
-    {% endfor %}
+    <div class="form-group row justify-content-center">
+        <div class="col-8">
+            {{form.year.label}}
+            {{form.year(class_="form-control")}}
+
+            {% for error in form.year.errors %}
+            <div class="badge badge-danger">{{error}}</div>
+            {% endfor %}
+        </div>
+    </div>
+
 
     <div class="form-group row justify-content-center">
         <button type="submit" class="btn btn-outline-light mt-2">Add League!</button>

@@ -8,6 +8,47 @@
 <meta id="js-user-id" data-user-id="{{player.team.user_id}}">
 <meta id="js-player-trades" data-trades="{{trade_suggestions}}">
 
+<div class="modal fade text-light text-center" id="trade-sim-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <p class="display-4">Simulate Trade</p>
+            </div>
+            <div class=" modal-body">
+                <form action="/leagues/{{player.league.id}}/trade-sim" method="POST">
+                    {{form.hidden_tag()}}
+                    <div class="row">
+                        <div class="col-6">
+                            {% for field in form if field.widget.input_type != 'hidden' %}
+                            {% if 'Other' not in field.label.text %}
+                            {{field.label}}
+                            {{field(class="form-control")}}
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="col-6">
+                            {% for field in form if field.widget.input_type != 'hidden' %}
+                            {% if 'Other' in field.label.text %}
+                            {{field.label}}
+                            {{field(class="form-control")}}
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <button class="btn btn-light my-2">Simulate Trade!</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12 col-md-4">
         {% if player.position == 'D/ST' %}
@@ -70,14 +111,19 @@
             <input type="text" name="player_grade" value="{{player.grade}}" hidden>
             <button class="btn btn-success text-center mt-1">Get Trade Suggestions</button>
         </form>
+        <div class="text-center">
+            <button class=" btn btn-outline-info btn-block mt-5" data-toggle="modal"
+                data-target="#trade-sim-modal">Trade
+                Simulation</button>
+        </div>
 
     </div>
 
 </div>
 
 
-<div class="row">
-    <div class="col-12 col-md-4 border w-100 mt-2" id="player_hidden_div">
+<div class="row justify-content-center">
+    <div class="col-12 col-md-10 border w-100 mt-5" id="player_hidden_div">
         <div class="d-flex justify-content-between border-bottom">
             <p class="lead" id="stat-title-name">Stat Name</p>
             <p class="lead" id="stat-title-val">Points From Stat</p>
@@ -87,74 +133,6 @@
             <p class="lead" id="outlook-title-val">Outlook</p>
         </div>
         <div id="player_stats_div">
-        </div>
-    </div>
-
-    <div class="col-12 col-md-8">
-        <h2 class="display-4 text-center">Simulate Trade</h2>
-        <div class="">
-            <form action="/leagues/{{player.league.id}}/trade-sim" method="POST">
-                {{form.hidden_tag()}}
-                <div class="row">
-                    <div class="col-6">
-                        <p>
-                            {{form.player_qb.label}}
-                            {{form.player_qb(class="form-control")}}
-                        </p>
-                        <p>
-                            {{form.player_rb.label}}
-                            {{form.player_rb(class="form-control")}}
-                        </p>
-                        <p>
-                            {{form.player_wr.label}}
-                            {{form.player_wr(class="form-control")}}
-                        </p>
-                        <p>
-                            {{form.player_te.label}}
-                            {{form.player_te(class="form-control")}}
-                        </p>
-                        <p>
-                            {{form.player_k.label}}
-                            {{form.player_k(class="form-control")}}
-                        </p>
-                        <p>
-                            {{form.player_dst.label}}
-                            {{form.player_dst(class="form-control")}}
-                        </p>
-                    </div>
-                    <div class="col-6">
-                        <p>
-                            {{form.other_qb.label}}
-                            {{form.other_qb(class="form-control")}}
-                        </p>
-                        <p>
-                            {{form.other_rb.label}}
-                            {{form.other_rb(class="form-control")}}
-                        </p>
-                        <p>
-                            {{form.other_wr.label}}
-                            {{form.other_wr(class="form-control")}}
-                        </p>
-                        <p>
-                            {{form.other_te.label}}
-                            {{form.other_te(class="form-control")}}
-                        </p>
-                        <p>
-                            {{form.other_k.label}}
-                            {{form.other_k(class="form-control")}}
-                        </p>
-                        <p>
-                            {{form.other_dst.label}}
-                            {{form.other_dst(class="form-control")}}
-                        </p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12 text-center">
-                        <button class="btn btn-light mb-2">Simulate Trade!</button>
-                    </div>
-                </div>
-            </form>
         </div>
     </div>
 
