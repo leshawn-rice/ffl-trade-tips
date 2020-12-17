@@ -9,6 +9,9 @@ import espn.views
 
 mail = Mail(app)
 
+# Maybe checkout change username/email
+# Checkout loading league settings on page load
+# more tests
 # Deploy
 
 
