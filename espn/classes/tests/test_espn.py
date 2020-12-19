@@ -2,12 +2,15 @@ from flask import session
 from flask_sqlalchemy import SQLAlchemy
 from unittest import TestCase
 from app.app import app
-from app.secrets import test_league_id, test_year
 from app.database import db, add_to_db
 from espn.classes.base_classes import ESPNRequest
 from espn.classes.espn_classes import League
 from user.models import UserModel
 from user.auth import UserAuthentication
+import os
+
+test_league_id = os.getenv('test_league_id')
+test_year = os.getenv('test_year')
 
 app.config['TESTING'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///ffl_trade_tips_test'

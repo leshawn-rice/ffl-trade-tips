@@ -192,37 +192,39 @@ class PlayerModelHandler(ModelHandlerBase):
         '''
         new_player = PlayerModel(player_id=self.instance.id, league_id=self.instance.league_id, team_id=self.instance.team_id, first_name=self.instance.first_name, last_name=self.instance.last_name,
                                  pro_team=self.instance.pro_team, position=self.instance.position, points=self.instance.points, projected_points=self.instance.projected_points, position_rank=self.instance.rank)
-        add_to_db(new_player)
+        db.session.add(new_player)
 
         for stat, val in self.instance.stats.items():
             new_stat = PlayerStatModel(
                 player_id=new_player.id, league_id=new_player.league_id, stat_name=stat, stat_value=val)
-            add_to_db(new_stat)
+            db.session.add(new_stat)
 
         if self.instance.outlooks:
             for outlook in self.instance.outlooks:
                 new_outlook = PlayerOutlookModel(
                     player_id=new_player.id, league_id=new_player.league_id, week=outlook[0], outlook=outlook[1])
-                add_to_db(new_outlook)
+                db.session.add(new_outlook)
+        db.session.commit()
 
     def update_player_stats(self, stat_records):
         '''
         Updates a players stats in the database
         given the stat_records param
         '''
-        player_id = PlayerModel.query.filter_by(
-            player_id=self.instance.id, league_id=self.instance.league_id).first().id
+        if stat_records:
+            player_id = stat_records[0].player_id
+        else:
+            player_id = PlayerModel.query.filter_by(
+                player_id=self.instance.id, league_id=self.instance.league_id).first().id
         stat_names = []
         for stat in stat_records:
             stat_names.append(stat.stat_name)
             if stat.stat_name in self.instance.stats.keys():
                 stat.stat_value = self.instance.stats[stat.stat_name]
-        db.session.commit()
 
         # Just like with the team, stat records may not match all stats, so we check and add if they dont exist
         for stat, val in self.instance.stats.items():
             if stat not in stat_names:
-                print(stat)
                 new_stat = PlayerStatModel(
                     player_id=player_id, league_id=self.instance.league_id, stat_name=stat, stat_value=val)
                 db.session.add(new_stat)

@@ -1,8 +1,9 @@
-from flask import render_template, redirect, session, request, jsonify, flash
+from flask import render_template, redirect, session, request, jsonify, flash, url_for
 from app.app import app
 from app.database import db, delete_from_db
 from espn.settings import POSITIONS, GRADE_MAP
 from espn.classes.news_class import News
+from espn.classes.espn_classes import League
 from espn.classes.league_handler_class import LeagueHandler
 from espn.models import LeagueModel, TeamModel, PlayerModel
 from user.models import UserModel
@@ -20,6 +21,143 @@ def show_news():
     news = News()
     news.get_news()
     return render_template('news.html', news=news.data)
+
+
+@app.route('/create-league', methods=['POST'])
+def create_league():
+    if 'user_id' not in session:
+        return (jsonify({'message': 'ERROR: USER NOT LOGGED IN'}), 400)
+
+    user_id = session['user_id']
+    data = request.json
+    if 'league_id' not in data or 'year' not in data:
+        return (jsonify({'message': 'ERROR: MISSING DATA'}), 400)
+
+    league_id = data['league_id']
+    year = data['year']
+    league = League(league_id=league_id, year=year, user_id=user_id)
+    league.handle_db()
+    league_model_id = league.league_info['league_model_id']
+    session['league_model_id'] = league_model_id
+    session['year'] = year
+
+    if league:
+        return (jsonify({'message': 'League Created!', 'league_model_id': league_model_id}), 200)
+    return (jsonify({'message': 'ERROR: League could not be created!'}))
+
+
+@app.route('/create-teams', methods=['POST'])
+def create_teams():
+    if 'user_id' not in session:
+        return (jsonify({'message': 'ERROR: USER NOT LOGGED IN'}), 400)
+    user_id = session['user_id']
+
+    if 'year' not in session:
+        return (jsonify({'message': 'ERROR: USER HAS NO LEAGUE'}), 400)
+    year = session['year']
+
+    data = request.json
+    if 'league_id' not in data:
+        return (jsonify({'message': 'ERROR: MISSING DATA'}), 400)
+    league_id = data['league_id']
+
+    league = League(league_id=league_id, year=year, user_id=user_id)
+    league_model_id = session.get('league_model_id')
+    league.league_info['league_model_id'] = league_model_id
+    if league_id != league.id:
+        return (jsonify({'message': 'ERROR: INVALID LEAGUE ID'}), 400)
+
+    league.get_teams()
+    for team in league.teams:
+        team.handle_db()
+    if league.teams:
+        return (jsonify({'message': 'Teams Created!'}), 200)
+    return (jsonify({'message': 'ERROR: Teams could not be created'}), 400)
+
+
+@app.route('/create-players', methods=['POST'])
+def create_players():
+    if 'user_id' not in session:
+        return (jsonify({'message': 'ERROR: USER NOT LOGGED IN'}), 400)
+    user_id = session['user_id']
+
+    if 'year' not in session:
+        return (jsonify({'message': 'ERROR: USER HAS NO LEAGUE'}), 400)
+    year = session['year']
+
+    data = request.json
+    if 'league_id' not in data:
+        return (jsonify({'message': 'ERROR: MISSING DATA'}), 400)
+    league_id = data['league_id']
+
+    league = League(league_id=league_id, year=year, user_id=user_id)
+    league_model_id = session.get('league_model_id')
+    league.league_info['league_model_id'] = league_model_id
+    if league_id != league.id:
+        return (jsonify({'message': 'ERROR: INVALID LEAGUE ID'}), 400)
+    league.get_teams()
+    for team in league.teams:
+        team.get_roster()
+        if len(team.roster) <= 0:
+            return (jsonify({'message': 'Players Could Not Be Created!'}), 200)
+    return (jsonify({'message': 'Players Created!'}), 200)
+
+
+@app.route('/add-players-to-db', methods=['POST'])
+def add_players_to_db():
+    if 'user_id' not in session:
+        return (jsonify({'message': 'ERROR: USER NOT LOGGED IN'}), 400)
+    user_id = session['user_id']
+
+    if 'year' not in session:
+        return (jsonify({'message': 'ERROR: USER HAS NO LEAGUE'}), 400)
+    year = session['year']
+
+    data = request.json
+    if 'league_id' not in data:
+        return (jsonify({'message': 'ERROR: MISSING DATA'}), 400)
+    league_id = data['league_id']
+
+    league = League(league_id=league_id, year=year, user_id=user_id)
+    league_model_id = session.get('league_model_id')
+    league.league_info['league_model_id'] = league_model_id
+    if league_id != league.id:
+        return (jsonify({'message': 'ERROR: INVALID LEAGUE ID'}), 400)
+    league.get_teams()
+    for team in league.teams:
+        team.get_roster()
+        for player in team.roster:
+            player.handle_db()
+
+    return (jsonify({'message': 'Players Added to DB!'}), 200)
+
+
+@app.route('/get-player-grades', methods=['POST'])
+def get_grade_ranges():
+    if 'user_id' not in session:
+        return (jsonify({'message': 'ERROR: USER NOT LOGGED IN'}), 400)
+    user_id = session['user_id']
+
+    if 'year' not in session:
+        return (jsonify({'message': 'ERROR: USER HAS NO LEAGUE'}), 400)
+    year = session['year']
+
+    data = request.json
+    if 'league_id' not in data:
+        return (jsonify({'message': 'ERROR: MISSING DATA'}), 400)
+    league_id = data['league_id']
+
+    league = League(league_id=league_id, year=year, user_id=user_id)
+    league_model_id = session.get('league_model_id')
+    league.league_info['league_model_id'] = league_model_id
+    if league_id != league.id:
+        return (jsonify({'message': 'ERROR: INVALID LEAGUE ID'}), 400)
+    league.get_teams()
+    for team in league.teams:
+        team.get_roster()
+    league.start_grading()
+    league.get_grades()
+    return (jsonify({'message': 'Grades Created!'}))
 
 
 @app.route('/add-league', methods=['GET', 'POST'])
@@ -60,7 +198,7 @@ def league_page(league_id):
     '''Displays information about the league with id league_id'''
     if 'user_id' not in session:
         return redirect('/login')
-    league = LeagueModel.query.get(league_id)
+    league = LeagueModel.query.get_or_404(league_id)
     if not league:
         return redirect('/leagues')
     if league.user_id == session.get('user_id'):
@@ -124,7 +262,7 @@ def select_team(league_id):
             user_team_id = form.team.data
             league.user_team = user_team_id
             db.session.commit()
-            return redirect('/')
+            return redirect('/leagues')
 
         return render_template('select_team.html', form=form)
 

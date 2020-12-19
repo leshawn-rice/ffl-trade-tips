@@ -2,7 +2,6 @@ from flask import session, request
 from flask_sqlalchemy import SQLAlchemy
 from unittest import TestCase
 from app.app import app
-from app.secrets import test_league_id, test_year
 from app.database import db, add_to_db
 from app.forms import AddLeagueForm, SelectTeamForm
 from espn import views
@@ -10,6 +9,10 @@ from espn.classes.espn_classes import League
 from espn.models import LeagueModel
 from user.auth import UserAuthentication
 from user.models import UserModel
+import os
+
+test_league_id = os.getenv('test_league_id')
+test_year = os.getenv('test_year')
 
 app.config['TESTING'] = True
 app.config['WTF_CSRF_ENABLED'] = False

@@ -127,7 +127,7 @@ class League(ESPNBase):
 
         self.num_teams = len(self.teams)
 
-    def get_scoring_ranges(self, grader):
+    def get_scoring_ranges(self):
         '''
         Gets the max and min score
         for each position in order
@@ -137,9 +137,9 @@ class League(ESPNBase):
             for player in team.roster:
                 record = PlayerModel.query.filter_by(
                     player_id=player.id, league_id=player.league_id).first()
-                grader.get_pos_extremes(record)
+                self.grader.get_pos_extremes(record)
 
-    def get_grades(self, grader):
+    def get_grades(self):
         '''
         Gets the letter grades for each
         player in the league, then uses those
@@ -151,7 +151,7 @@ class League(ESPNBase):
             for player in team.roster:
                 record = PlayerModel.query.filter_by(
                     player_id=player.id, league_id=player.league_id).first()
-                record.grade = grader.grade_player(record)
+                record.grade = self.grader.grade_player(record)
                 db.session.commit()
                 team_score += GRADE_TO_VALUE[record.grade]
 
@@ -163,12 +163,14 @@ class League(ESPNBase):
             record.grade = team_grade
             db.session.commit()
 
-    def grade_teams(self):
+    def create_grader(self):
+        self.grader = GradeCalculator(self.settings.scoring_settings)
+
+    def start_grading(self):
         '''Calls grading functions'''
-        grader = GradeCalculator(self.settings.scoring_settings)
-        self.get_scoring_ranges(grader)
-        grader.set_grade_ranges()
-        self.get_grades(grader)
+        self.create_grader()
+        self.get_scoring_ranges()
+        self.grader.set_grade_ranges()
 
     def handle_db(self):
         '''Handles adding league info to the database'''
@@ -187,9 +189,6 @@ class League(ESPNBase):
         self.get_basic_info()
         self.get_settings()
         self.get_num_teams()
-        self.handle_db()
-        self.get_teams()
-        self.grade_teams()
 
 
 class Team(ESPNBase):
@@ -264,8 +263,6 @@ class Team(ESPNBase):
         '''Drives necessary functions for adding a team'''
         self.get_basic_info()
         self.get_stats()
-        self.handle_db()
-        self.get_roster()
 
 
 class Player(ESPNBase):
@@ -354,4 +351,3 @@ class Player(ESPNBase):
         '''Drives player creation'''
         self.get_basic_info()
         self.get_stats()
-        self.handle_db()

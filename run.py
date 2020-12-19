@@ -1,18 +1,18 @@
 from flask import render_template, flash, redirect
 from flask_mail import Mail, Message
-from app.secrets import email_username
 from app.app import app
-from app.database import refresh_tables
+from app.database import db
 from app.forms import ContactForm
 import user.views
 import espn.views
+import os
+
+EMAIL = os.environ.get('EMAIL', None)
 
 mail = Mail(app)
 
-# Maybe checkout change username/email
-# Checkout loading league settings on page load
-# more tests
-# Deploy
+db.drop_all()
+db.create_all()
 
 
 def send_email(sender, message):
@@ -21,7 +21,7 @@ def send_email(sender, message):
     address in app.secrets
     '''
     msg = Message('Contact From FFL-Trade-Tips', sender=sender,
-                  recipients=[email_username])
+                  recipients=[EMAIL])
     msg.body = f'From email: {sender}\nMessage: {message}'
     mail.send(msg)
 

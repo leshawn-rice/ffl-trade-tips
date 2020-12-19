@@ -52,21 +52,122 @@ function addDeleteLeagueAlert() {
   });
 }
 
-function addNewLeagueLoadingScreen() {
+async function createGrades(leagueId) {
+  request_data = { league_id: leagueId };
+  response = await axios.post('/get-player-grades', request_data);
+  if (response.data.message === 'Grades Created!') {
+    return true;
+  }
+  else {
+    return false
+  }
+}
+
+async function createTeams(leagueId) {
+  request_data = { league_id: leagueId };
+  response = await axios.post('/create-teams', request_data);
+  if (response.data.message === 'Teams Created!') {
+    return true;
+  }
+  else {
+    return false
+  }
+}
+
+async function createLeague(leagueId, year) {
+  request_data = { league_id: leagueId, year: year };
+  response = await axios.post('/create-league', request_data);
+  if (response.data.message === 'League Created!') {
+    return response.data.league_model_id;
+  }
+  else {
+    return undefined
+  }
+}
+
+async function createPlayers(leagueId) {
+  request_data = { league_id: leagueId };
+  response = await axios.post('/create-players', request_data);
+  if (response.data.message === 'Players Created!') {
+    return true;
+  }
+  else {
+    return false
+  }
+}
+
+async function addPlayersToDb(leagueId) {
+  request_data = { league_id: leagueId };
+  response = await axios.post('/add-players-to-db', request_data);
+  if (response.data.message === 'Players Added to DB!') {
+    return true;
+  }
+  else {
+    return false
+  }
+}
+
+function appendLoadingDiv(col, text) {
+  div = $(`<h1 class="h6">${text}</h1>`);
+  col.append(div);
+}
+
+async function checkForSuccess(leagueId, leagueModelId, col) {
+  if (leagueModelId) {
+    col.empty();
+    appendLoadingDiv(col, 'Fetching Teams <i class="fas fa-spinner fa-spin"></i>');
+    teamsCreated = await createTeams(leagueId);
+    if (teamsCreated) {
+      col.empty();
+      appendLoadingDiv(col, 'Fetching Players <i class="fas fa-spinner fa-spin"></i>');
+      playersCreated = await createPlayers(leagueId);
+      if (playersCreated) {
+        col.empty();
+        appendLoadingDiv(col, 'Adding Players to Database <i class="fas fa-spinner fa-spin"></i>');
+        playersAddedToDb = await addPlayersToDb(leagueId)
+        if (playersAddedToDb) {
+          col.empty();
+          appendLoadingDiv(col, 'Grading Players <i class="fas fa-spinner fa-spin"></i>');
+          gradesCreated = await createGrades(leagueId);
+          if (gradesCreated) {
+            col.empty();
+            return true;
+          }
+        }
+      }
+    }
+  }
+  appendLoadingDiv(col, 'SOMETHING WENT WRONG!');
+  return false;
+}
+
+async function addNewLeagueLoadingScreen() {
   /*
   Adds loading icon to add league
   page after add league button is
   pressed
   */
-  const $content = $('.container-fluid')
-  const $addLeagueForm = $('#add-league-form')
-  $addLeagueForm.submit(() => {
-    const $loadingRow = $('<div class="row">')
-    const $loadingCol = $('<div class="col-12 text-center">')
-    const $loadingDiv = $('<i class="fas fa-spinner fa-pulse fa-3x">')
-    $loadingCol.append($loadingDiv)
-    $loadingRow.append($loadingCol)
-    $content.append($loadingRow)
+  const $content = $('.container-fluid');
+  const $addLeagueForm = $('#add-league-form');
+  $addLeagueForm.submit(async (event) => {
+    event.preventDefault();
+    const leagueId = $addLeagueForm.find('input[name="league_id"]').val()
+    const year = $addLeagueForm.find('input[name="year"]').val()
+    const $loadingRow = $('<div class="row">');
+    const $loadingCol = $('<div class="col-12 text-center">');
+    $loadingRow.append($loadingCol);
+    $content.append($loadingRow);
+    appendLoadingDiv($loadingCol, 'Fetching League <i class="fas fa-spinner fa-spin"></i>');
+    const leagueModelId = await createLeague(leagueId, year);
+    let success = await checkForSuccess(leagueId, leagueModelId, $loadingCol);
+
+    if (success) {
+      location = `/leagues/${leagueModelId}/select-team`;
+    }
+    else {
+      location = `/add-league`;
+    }
+
   });
 }
 
@@ -217,7 +318,7 @@ async function addPageItems() {
   setAddLeagueBtnLink();
   addDeleteAccountAlert();
   addDeleteLeagueAlert();
-  addNewLeagueLoadingScreen();
+  await addNewLeagueLoadingScreen();
   await addPlayerListeners();
   await addSaveTradeListener();
 }
