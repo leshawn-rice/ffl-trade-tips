@@ -345,7 +345,7 @@ class Player(ESPNBase):
         '''Handles adding the instance to the database'''
         # Allows us to add or update without any crazy logic
         db_handler = PlayerModelHandler(self)
-        db_handler.add_or_update_record()
+        db_handler.add_record()
 
     def create_player(self):
         '''Drives player creation'''

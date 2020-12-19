@@ -98,38 +98,38 @@ def create_players():
     league.get_teams()
     for team in league.teams:
         team.get_roster()
-        if len(team.roster) <= 0:
-            return (jsonify({'message': 'Players Could Not Be Created!'}), 200)
+        for player in team.roster:
+            player.handle_db()
     return (jsonify({'message': 'Players Created!'}), 200)
 
 
-@app.route('/add-players-to-db', methods=['POST'])
-def add_players_to_db():
-    if 'user_id' not in session:
-        return (jsonify({'message': 'ERROR: USER NOT LOGGED IN'}), 400)
-    user_id = session['user_id']
+# @app.route('/add-players-to-db', methods=['POST'])
+# def add_players_to_db():
+#     if 'user_id' not in session:
+#         return (jsonify({'message': 'ERROR: USER NOT LOGGED IN'}), 400)
+#     user_id = session['user_id']
 
-    if 'year' not in session:
-        return (jsonify({'message': 'ERROR: USER HAS NO LEAGUE'}), 400)
-    year = session['year']
+#     if 'year' not in session:
+#         return (jsonify({'message': 'ERROR: USER HAS NO LEAGUE'}), 400)
+#     year = session['year']
 
-    data = request.json
-    if 'league_id' not in data:
-        return (jsonify({'message': 'ERROR: MISSING DATA'}), 400)
-    league_id = data['league_id']
+#     data = request.json
+#     if 'league_id' not in data:
+#         return (jsonify({'message': 'ERROR: MISSING DATA'}), 400)
+#     league_id = data['league_id']
 
-    league = League(league_id=league_id, year=year, user_id=user_id)
-    league_model_id = session.get('league_model_id')
-    league.league_info['league_model_id'] = league_model_id
-    if league_id != league.id:
-        return (jsonify({'message': 'ERROR: INVALID LEAGUE ID'}), 400)
-    league.get_teams()
-    for team in league.teams:
-        team.get_roster()
-        for player in team.roster:
-            player.handle_db()
+#     league = League(league_id=league_id, year=year, user_id=user_id)
+#     league_model_id = session.get('league_model_id')
+#     league.league_info['league_model_id'] = league_model_id
+#     if league_id != league.id:
+#         return (jsonify({'message': 'ERROR: INVALID LEAGUE ID'}), 400)
+#     league.get_teams()
+#     for team in league.teams:
+#         team.get_roster()
+#         for player in team.roster:
+#             player.handle_db()
 
-    return (jsonify({'message': 'Players Added to DB!'}), 200)
+#     return (jsonify({'message': 'Players Added to DB!'}), 200)
 
 
 @app.route('/get-player-grades', methods=['POST'])

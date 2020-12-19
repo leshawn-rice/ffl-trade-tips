@@ -122,21 +122,22 @@ async function checkForSuccess(leagueId, leagueModelId, col) {
       appendLoadingDiv(col, 'Fetching Players <i class="fas fa-spinner fa-spin"></i>');
       playersCreated = await createPlayers(leagueId);
       if (playersCreated) {
+        // col.empty();
+        // appendLoadingDiv(col, 'Adding Players to Database <i class="fas fa-spinner fa-spin"></i>');
+        // playersAddedToDb = await addPlayersToDb(leagueId)
+        // if (playersAddedToDb) {
         col.empty();
-        appendLoadingDiv(col, 'Adding Players to Database <i class="fas fa-spinner fa-spin"></i>');
-        playersAddedToDb = await addPlayersToDb(leagueId)
-        if (playersAddedToDb) {
+        appendLoadingDiv(col, 'Grading Players <i class="fas fa-spinner fa-spin"></i>');
+        gradesCreated = await createGrades(leagueId);
+        if (gradesCreated) {
           col.empty();
-          appendLoadingDiv(col, 'Grading Players <i class="fas fa-spinner fa-spin"></i>');
-          gradesCreated = await createGrades(leagueId);
-          if (gradesCreated) {
-            col.empty();
-            return true;
-          }
+          return true;
         }
+        // }
       }
     }
   }
+  col.empty();
   appendLoadingDiv(col, 'SOMETHING WENT WRONG!');
   return false;
 }
