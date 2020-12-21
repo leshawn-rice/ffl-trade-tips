@@ -145,10 +145,8 @@ async function addNewLeagueLoadingScreen() {
   */
   const $content = $('.container-fluid');
   const $addLeagueForm = $('#add-league-form');
-  const $addLeagueBtn = $('#add-league-btn');
   $addLeagueForm.submit(async (event) => {
     event.preventDefault();
-    $addLeagueBtn.attr('disabled', 'disabled');
     const leagueId = $addLeagueForm.find('input[name="league_id"]').val()
     const year = $addLeagueForm.find('input[name="year"]').val()
     const $loadingRow = $('<div class="row">');
