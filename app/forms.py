@@ -53,20 +53,6 @@ class AddLeagueForm(FlaskForm):
         message='You must enter a year!'), NumberRange(min=2000, max=2024)])
 
 
-class ContactForm(FlaskForm):
-    '''
-    Form for sending an email
-    Fields:
-            email, message
-    Validation:
-                All inputs required, email must be a valid email, message cannot be blank
-    '''
-    email = StringField('Email', validators=[InputRequired(
-        message='Email cannot be blank!'), Email(message='Invalid Email!')])
-    message = TextAreaField('Message', validators=[
-        InputRequired(message='Message cannot be blank!')])
-
-
 class SelectTeamForm(FlaskForm):
     '''
     Form for sending an email

@@ -35,6 +35,14 @@ def create_league():
 
     league_id = data['league_id']
     year = data['year']
+
+    existing_leagues = LeagueModel.query.filter_by(
+        league_id=league_id, year=year, user_id=user_id).all()
+    if existing_leagues:
+        for league in existing_leagues:
+            db.session.delete(league)
+            db.session.commit()
+
     league = League(league_id=league_id, year=year, user_id=user_id)
     league.handle_db()
     league_model_id = league.league_info['league_model_id']
@@ -188,6 +196,8 @@ def refresh_league(league_id):
     # e_league stands for existing league
     e_league = LeagueModel.query.get(league_id)
     form = AddLeagueForm(obj=e_league)
+    db.session.delete(e_league)
+    db.session.commit()
 
     if form.validate_on_submit():
         league = league_handler.add_league(form)

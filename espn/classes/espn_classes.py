@@ -178,7 +178,7 @@ class League(ESPNBase):
         # Refresh league stats without having to worry
         # About whether a record already exists
         db_handler = LeagueModelHandler(self)
-        db_handler.add_or_update_record()
+        db_handler.add_record()
 
     def create_league(self):
         '''
@@ -257,7 +257,7 @@ class Team(ESPNBase):
         '''Handles adding the team to the database'''
         # Used to add or update the db as needed
         db_handler = TeamModelHandler(self)
-        db_handler.add_or_update_record()
+        db_handler.add_record()
 
     def create_team(self):
         '''Drives necessary functions for adding a team'''
